@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import DehazeOutlinedIcon from '@mui/icons-material/DehazeOutlined';
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
 import HeadsetRoundedIcon from '@mui/icons-material/HeadsetRounded';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../redux/slices/authSlice';
 
 
 const Header = ({ isTransparent }) => {
+    const user = useSelector((state) => state.auth.user)
+    const [openMenu, setOpenMenu] = useState(false)
+    const dispatch = useDispatch();
 
     const location = useLocation();
     const currentPath = location.pathname;
@@ -39,9 +44,46 @@ const Header = ({ isTransparent }) => {
                     </div>
 
                     <div className={`whitespace-nowrap space-x-4 text-xs`}>
-                        <Link to="/register" className="hover:text-primary font-medium">ĐĂNG KÝ</Link>
-                        <span>|</span>
-                        <Link to="/login" className="hover:text-primary font-medium">ĐĂNG NHẬP</Link>
+                        {user ? (
+                            <div className='flex space-x-3 items-center'>
+                                <div className='flex items-center relative'>
+                                    <Link
+                                        to="/profile" className="hover:text-primary font-medium"
+                                    >
+                                        TÀI KHOẢN
+                                    </Link>
+                                    <ArrowDropDownOutlinedIcon className='cursor-pointer' onClick={() => setOpenMenu(!openMenu)} />
+                                    {openMenu ? 
+                                        (
+                                        <div className="absolute top-0 left-0 z-10 mt-10 w-48 bg-white shadow-lg border border-gray-200 rounded-md">
+                                            <Link to="/profile" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                                Thông tin tài khoản
+                                            </Link>
+                                            <Link to="/orders" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                                Đơn hàng của bạn
+                                            </Link>
+                                            <Link to="/wishlist" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                                Địa chỉ của bạn
+                                            </Link>
+                                        </div>
+                                        ) : (  '' )
+                                    }
+                                </div>
+                                <span>|</span>
+                                <p
+                                    className='hover:text-primary font-medium cursor-pointer'
+                                    onClick={() => dispatch(logout())}
+                                >
+                                    THOÁT
+                                </p>
+                            </div>
+                        ) : (
+                            <>
+                                <Link to="/register" className="hover:text-primary font-medium">ĐĂNG KÝ</Link>
+                                <span>|</span>
+                                <Link to="/login" className="hover:text-primary font-medium">ĐĂNG NHẬP</Link>
+                            </>
+                        )}
                     </div>
 
                     <Link to="/cart" className='relative '>
@@ -86,11 +128,11 @@ const Header = ({ isTransparent }) => {
                                     {/* Dropdown menu */}
                                     <div className="absolute left-0 mt-2 w-56 bg-white shadow-lg border border-gray-200 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 z-200">
                                         {["Sofa", "Ghế", "Trang trí", "Kệ sách", "Bàn", "Tủ quần áo"].map((item, index) => (
-                                           <div
+                                            <div
                                                 key={index}
                                                 className="px-4 py-3 text-sm text-black hover:bg-gray-100 cursor-pointer"
                                             >
-                                            <div className="w-[90%] border-b border-orange-400 pl-3 pb-2">{item}</div>
+                                                <div className="w-[90%] border-b border-orange-400 pl-3 pb-2">{item}</div>
                                             </div>
                                         ))}
                                     </div>

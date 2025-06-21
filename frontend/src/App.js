@@ -20,7 +20,8 @@ import Checkout from './pages/Checkout';
 import AdminLayout from './components/admin/AdminLayout';
 import Product from './pages/Product';
 import ProductListPage from './pages/ProductListPage';
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
@@ -42,8 +43,10 @@ function App() {
   }
   window.scrollTo(0, 0);
   return (
+    <>
       <Routes>
-        <Route path='admin' element={<AdminLayout isAuthenticated={isAuthenticated}/>}/>
+        <Route path="/admin" element={<AdminLayout isAuthenticated={isAuthenticated} />}>
+        </Route>
         <Route path='/' element={<MainLayout isAuthenticated={isAuthenticated}/>}>
           <Route path='/login' element={<Login isAuthenticated={isAuthenticated}/>} />
           <Route path='/register' element={<Register isAuthenticated={isAuthenticated}/>} />
@@ -63,6 +66,8 @@ function App() {
           <Route path='allproducts' element={<ProductListPage />} />
         </Route>
       </Routes>
+      <ToastContainer position="top-center" autoClose={3000} />
+    </>
   );
 }
 

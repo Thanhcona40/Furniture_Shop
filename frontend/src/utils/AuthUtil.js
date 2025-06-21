@@ -1,6 +1,6 @@
 export async function checkAuthenticated(){
     var ok = false;
 
-    const userData = localStorage.getItem('userData');
+    const userData = localStorage.getItem('user');
     return userData !== null;
 }
