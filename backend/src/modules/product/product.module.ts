@@ -12,10 +12,10 @@ import { VariantProductSchema } from './schemas/product-variant.schema';
       {name: 'Product', schema: ProductSchema}
     ]),
     MongooseModule.forFeature([
-      {name: 'VariantProduct', schema: VariantProductSchema} // Assuming Category is also related to Product
+      {name: 'VariantProduct', schema: VariantProductSchema} 
     ]),
     MongooseModule.forFeature([
-      {name: 'ProductReview', schema: ProductReviewSchema} // Assuming Product is related to itself
+      {name: 'ProductReview', schema: ProductReviewSchema} 
     ]),
   ],
   providers: [ProductService],

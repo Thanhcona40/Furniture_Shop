@@ -4,7 +4,6 @@ import { Product } from "./product.schema";
 import { CartItem } from "src/modules/cart/schemas/cart-item.schema";
 import { OrderItem } from "src/modules/order/schemas/order-item.schema";
 
-
 @Schema({ timestamps: true })
 export class VariantProduct {
   @Prop() color: string;
