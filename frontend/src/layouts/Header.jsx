@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import DehazeOutlinedIcon from '@mui/icons-material/DehazeOutlined';
 import SearchIcon from "@mui/icons-material/Search";
@@ -7,17 +7,29 @@ import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined
 import HeadsetRoundedIcon from '@mui/icons-material/HeadsetRounded';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/slices/authSlice';
-
+import { initializeCart, fetchCartItems } from '../redux/slices/cartSlice';
 
 const Header = ({ isTransparent }) => {
     const user = useSelector((state) => state.auth.user)
+    const { cartId, cartItems } = useSelector((state) => state.cart)
     const [openMenu, setOpenMenu] = useState(false)
     const dispatch = useDispatch();
 
     const location = useLocation();
     const currentPath = location.pathname;
 
+    // Initialize cart when user is logged in
+    useEffect(() => {
+        if (user?._id && !cartId) {
+            dispatch(initializeCart(user._id));
+        }
+    }, [user, cartId, dispatch]);
+
     const isActive = (path) => currentPath === path;
+    
+    // Calculate total items in cart
+    const cartItemCount = cartItems.reduce((total, item) => total + 1, 0);
+
     return (
         <header className={`w-full left-0 z-30 ${isTransparent ? "absolute" : "relative bg-white"}`}>
             <div className="relative z-10 w-9/12 mx-auto">
@@ -90,9 +102,11 @@ const Header = ({ isTransparent }) => {
                         <div className={`text-2xl text-primary cursor-pointer`}>
                             <ShoppingCartOutlinedIcon />
                         </div>
-                        <div className="absolute top-0 -right-2 bg-blue-950 text-white font-semibold text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                            0
-                        </div>
+                        {cartItemCount > 0 && (
+                            <div className="absolute top-0 -right-2 bg-blue-900 text-white font-semibold text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                {cartItemCount > 99 ? '99+' : cartItemCount}
+                            </div>
+                        )}
                     </Link>
                 </div>
 

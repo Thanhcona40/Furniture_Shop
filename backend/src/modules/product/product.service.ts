@@ -33,7 +33,11 @@ export class ProductService {
     const product = await this.productModel
       .findById(id)
       .populate('category_id', '_id name')
-      .populate('variants')
+      .populate({
+        path: 'variants',
+        model: VariantProduct.name,
+        select: '_id product_id color dimensions price quantity url_media', // Lấy các trường cần thiết
+      })
       .exec();
     if (!product) {
       throw new NotFoundException('Product not found');

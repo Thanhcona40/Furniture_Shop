@@ -2,10 +2,8 @@ import React from 'react';
 import KeyboardArrowLeftOutlinedIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import KeyboardArrowRightOutlinedIcon from '@mui/icons-material/KeyboardArrowRightOutlined';
 import ProductCard from '../product/ProductCard';
-import products from '../product/product';
 
-const NewProduct = () => {
-    const productInitial = products[0];
+const NewProduct = ({products}) => {
     return (
         <div className='max-w-[1110px] max-h-[600px]  mx-auto mb-5 px-4 flex flex-col lg:flex-row gap-10'>
             <div className='w-full'>
@@ -23,7 +21,7 @@ const NewProduct = () => {
                     </div>
                 </div>
                 <div className="grid md:grid-cols-4 lg:grid-cols-5 gap-3">
-                    {products.slice(1).map((item) => (
+                    {products?.slice(1).map((item) => (
                         <ProductCard key={item.id} product={item} />
                     ))}
                 </div>

@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CartController } from './cart.controller';
-import { CartSchema } from './schemas/cart.schema';
-import { CartItemSchema } from './schemas/cart-item.schema';
+import { Cart, CartSchema } from './schemas/cart.schema';
+import { CartItem, CartItemSchema } from './schemas/cart-item.schema';
+import { VariantProduct, VariantProductSchema } from '../product/schemas/product-variant.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: 'Cart', schema: CartSchema}
-    ]),
-    MongooseModule.forFeature([
-      { name: 'CartItem', schema: CartItemSchema }
+      { name: Cart.name, schema: CartSchema },
+      { name: CartItem.name, schema: CartItemSchema },
+      { name: VariantProduct.name, schema: VariantProductSchema }
     ]),
   ],
   providers: [CartService],

@@ -18,8 +18,6 @@ import Order from './pages/Order';
 import Contact from './pages/Contact';
 import Checkout from './pages/Checkout';
 import AdminLayout from './components/admin/AdminLayout';
-import Product from './pages/Product';
-import ProductListPage from './pages/ProductListPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Dashboard from './components/admin/Dashboard';
@@ -27,6 +25,8 @@ import UserManagement from './components/admin/UserManagement';
 import OrderManagement from './components/admin/OrderManagement';
 import ProductManagement from './components/admin/product/ProductManagement';
 import CategoryManagement from './components/admin/category/CategoryManagement';
+import ProductListPage from './pages/ProductPage/ProductListPage';
+import ProductDetail from './pages/ProductPage/ProductDetail';
 
 function App() {
 
@@ -69,7 +69,7 @@ function App() {
           <Route path='search' element={<SearchPage />} />
           <Route path='contact' element={<Contact />} />
           <Route path='checkout' element={<Checkout />} />
-          <Route path='product/:productInfo' element={<Product />} />
+          <Route path='product/:id' element={<ProductDetail />} />
           <Route path='allproducts' element={<ProductListPage />} />
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />

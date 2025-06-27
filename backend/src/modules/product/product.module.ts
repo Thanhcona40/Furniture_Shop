@@ -9,12 +9,8 @@ import { VariantProductSchema } from './schemas/product-variant.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      {name: 'Product', schema: ProductSchema}
-    ]),
-    MongooseModule.forFeature([
-      {name: 'VariantProduct', schema: VariantProductSchema} 
-    ]),
-    MongooseModule.forFeature([
+      {name: 'Product', schema: ProductSchema},
+      {name: 'VariantProduct', schema: VariantProductSchema} ,
       {name: 'ProductReview', schema: ProductReviewSchema} 
     ]),
   ],

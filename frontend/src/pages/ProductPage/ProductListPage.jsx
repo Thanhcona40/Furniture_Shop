@@ -1,10 +1,33 @@
-import React, { useState } from 'react';
-import ProductCard from '../components/product/ProductCard';
-import products from '../components/product/product';
-import CategoryMenu from '../layouts/CategoryMenu';
-import FilterSidebar from '../components/product/FilterSideBar';
+import React, { useEffect, useState } from 'react';
+import ProductCard from '../../components/product/ProductCard';
+import CategoryMenu from '../../layouts/CategoryMenu';
+import FilterSidebar from '../../components/product/FilterSideBar';
+import {toast} from 'react-toastify'
+import { getProducts } from '../../api/product';
+
 
 const ProductListPage = () => {
+  const [loading, setLoading] = useState(false)
+   const [products, setProducts] = useState([])
+    
+    useEffect(() => {
+        if (!products?.length) {
+        const fetchProducts = async () => {
+            try {
+            const response = await getProducts();
+            setProducts(response.data);
+            setLoading(false);
+            } catch (err) {
+            toast.error(err?.response?.data?.message);
+            setLoading(false);
+            }
+        };
+        fetchProducts();
+        } else {
+        setLoading(false);
+        }
+    }, [products]);
+
   const [filter, setFilter] = useState({ brands: [], prices: []});
   const [type, setType] = useState("Tất cả sản phẩm");
   const currentProducts = products.filter((product) => {
@@ -42,6 +65,7 @@ const ProductListPage = () => {
       return brandMatch && priceMatch;
     });
   };
+   if (loading) return <div>Loading...</div>;
     return (
         <div className="relative max-w-[1110px] mx-auto mb-5"> {/* giống với CategoryMenu */}
             {/* Category Menu nằm ở trên, căn giữa theo 1200px */}

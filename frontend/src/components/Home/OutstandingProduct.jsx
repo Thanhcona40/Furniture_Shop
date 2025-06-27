@@ -1,21 +1,22 @@
 import React from 'react';
-import products from '../product/product';
 import ProductCard from '../product/ProductCard';
 import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import KeyboardArrowLeftOutlinedIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import KeyboardArrowRightOutlinedIcon from '@mui/icons-material/KeyboardArrowRightOutlined';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
-const OutstandingProduct = () => {
-    const productInitial = products[0];
+const OutstandingProduct = ({products}) => {
+    const productInitial = products?.[0] || null;
+    const navigate = useNavigate()
     return (
         <div className='max-w-[1110px] max-h-[600px]  mx-auto mb-5 px-4 flex flex-col lg:flex-row gap-10'>
             <div className='lg:w-1/3 w-full border border-primary p-4 inline-block'>
                 <div className="group relative selection:overflow-hidden transition-all">
-                    <div className="relative w-full aspect-[2/1] min-h-[300px] bg-gray-100 overflow-hidden">
-                        <img src={productInitial.image} className="w-full h-full object-cover" />
+                    <div className="relative w-full aspect-[2/1] min-h-[300px] bg-gray-100 overflow-hidden cursor-pointer"
+                        onClick={() => navigate(`/product/${productInitial._id}`)}>
+                        <img src={productInitial?.thumbnail_url} className="w-full h-full object-cover" />
                         <div className='absolute top-0 right-0 bg-primary rounded-xl text-white px-4 text-sm font-semibold'>
                             HOT
                         </div>
@@ -29,9 +30,9 @@ const OutstandingProduct = () => {
                         </div>
                     </div>
                     <div className="mt-10 text-center space-y-2">
-                        <h4 className="text-gray-800 text-xl font-medium">{productInitial.name}</h4>
+                        <h4 className="text-gray-800 text-xl font-medium">{productInitial?.name}</h4>
                         <p className="text-primary mt-1 font-medium">
-                            {productInitial.price.toLocaleString()}
+                            {productInitial?.price.toLocaleString()}
                             <span className="text-xs inline-block ml-1 relative -top-1 underline "> đ</span>
                         </p>
                     </div>
@@ -59,7 +60,7 @@ const OutstandingProduct = () => {
                     </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {products.slice(1).map((item) => (
+                    {products?.slice(1).map((item) => (
                         <ProductCard key={item.id} product={item} />
                     ))}
                 </div>

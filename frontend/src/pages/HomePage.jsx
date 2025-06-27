@@ -1,16 +1,40 @@
-import React from 'react';
 import banner from '../assets/banner.jpg'; 
 import CategoryMenu from '../layouts/CategoryMenu';
 import OutstandingProduct from '../components/Home/OutstandingProduct';
 import HotProduct from '../components/Home/HotProduct';
 import NewProduct from '../components/Home/NewProduct';
 import GoodTrick from '../components/Home/GoodTrick';
+import { useEffect, useState } from 'react';
+import { getProducts } from '../api/product';
+import {toast} from 'react-toastify'
 
 
 const HomePage = () => {
+    const [loading, setLoading] = useState(false)
+    const [products, setProducts] = useState(null)
+    
+    useEffect(() => {
+        if (!products?.length) {
+        const fetchProducts = async () => {
+            try {
+            const response = await getProducts();
+            setProducts(response.data);
+            setLoading(false);
+            } catch (err) {
+            toast.error(err?.response?.data?.message);
+            setLoading(false);
+            }
+        };
+        fetchProducts();
+        } else {
+        setLoading(false);
+        }
+    }, [products]);
+
+    if (loading) return <div>Loading...</div>;
+
     return (
         <>
-            {/* Banner + Category Menu */}
             <div className="relative h-screen">
                 <img
                     src={banner}
@@ -23,9 +47,8 @@ const HomePage = () => {
                 </div>
             </div>
 
-            {/* Nội dung phía dưới */}
             <div className="mt-32">
-                <OutstandingProduct />
+                <OutstandingProduct products={products}/>
             </div>
 
             <div className='flex max-w-[1110px] mx-auto my-16 px-4 gap-3'>
@@ -67,7 +90,7 @@ const HomePage = () => {
                 </div>
             </div>
 
-            <HotProduct />
+            <HotProduct products={products}/>
 
             <div className='relative overflow-hidden group cursor-pointer max-w-[1110px] mx-auto my-16 px-4'>
                 <img 
@@ -76,7 +99,7 @@ const HomePage = () => {
                     className='w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105'/>
             </div>
 
-            <NewProduct />
+            <NewProduct products={products}/>
 
             <div className='mb-10'>
                 <GoodTrick/>
