@@ -4,11 +4,17 @@ import { Document, Types } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class OrderTrack  {
-  @Prop({ type: Types.ObjectId, ref: 'Order' })
+  @Prop({ type: Types.ObjectId, ref: 'Order', required: true })
   order_id: Order;
 
-  @Prop() status: string;
-  @Prop() notes: string;
+  @Prop({ required: true })
+  status: string;
+
+  @Prop({ required: true })
+  description: string;
+
+  @Prop()
+  notes: string;
 }
 
 export type OrderTrackDocument = OrderTrack & Document;

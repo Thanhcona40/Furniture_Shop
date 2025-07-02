@@ -1,16 +1,17 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Province } from "./province.schema"; 
 import { District } from "./district.schema";
-import { Ward } from "./ward.schema";
+
 import { Document, Types } from "mongoose";
+import { Ward } from "./ward.schema";
 
 
 @Schema({ _id: false })
 export class Address  {
    @Prop() detail: string;
-  @Prop({ type: Types.ObjectId, ref: 'Province' }) province_id: Province;
-  @Prop({ type: Types.ObjectId, ref: 'District' }) district_id: District;
-  @Prop({ type: Types.ObjectId, ref: 'Ward' }) ward_id: Ward;
+  @Prop({ type: String, ref: 'Province' }) province_id: string;
+  @Prop({ type: String, ref: 'District' }) district_id: string;
+  @Prop({ type: String, ref: 'Ward' }) ward_id: string;
 }
 
 export type AddressDocument = Address & Document; 

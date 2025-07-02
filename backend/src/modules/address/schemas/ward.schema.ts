@@ -3,11 +3,12 @@ import { Prop, SchemaFactory } from "@nestjs/mongoose";
 import { Document, Types } from "mongoose"; 
 import { District } from "./district.schema";
 
+
 @Schema({ timestamps: true })
 export class Ward {
-  @Prop({ required: true })
-  name: string;
-
+  @Prop({ required: true, type: String }) _id: string; 
+  @Prop({ required: true }) name: string;
+  
   @Prop({ type: Types.ObjectId, ref: 'District' })
   district_id: District | string; 
 }

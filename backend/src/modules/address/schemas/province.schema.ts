@@ -3,6 +3,7 @@ import { Document } from "mongoose";
 
 @Schema({ timestamps: true })
 export class Province {
+  @Prop({ required: true, type: String }) _id: string; 
   @Prop({ required: true }) name: string;
 }
 

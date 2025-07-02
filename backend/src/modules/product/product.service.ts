@@ -40,7 +40,7 @@ export class ProductService {
       })
       .exec();
     if (!product) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
     return product;
   }
@@ -56,7 +56,7 @@ export class ProductService {
       .populate('variants')
       .exec();
     if (!updatedProduct) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
     return updatedProduct;
   }
@@ -64,7 +64,7 @@ export class ProductService {
   async remove(id: string): Promise<void> {
     const product = await this.productModel.findById(id).exec();
     if (!product) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
     await this.variantModel.deleteMany({ product_id: id }).exec();
     await this.productModel.findByIdAndDelete(id).exec();
@@ -73,7 +73,7 @@ export class ProductService {
   async addVariant(productId: string, variantData: any): Promise<VariantProduct> {
     const product = await this.productModel.findById(productId);
     if (!product) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Không tìm thấy sản phẩm');
     }
     const variant = new this.variantModel({ ...variantData, product_id: productId });
     const savedVariant = await variant.save();
@@ -87,7 +87,7 @@ export class ProductService {
       .findByIdAndUpdate(variantId, updateVariantDto, { new: true, runValidators: true })
       .exec();
     if (!updatedVariant) {
-      throw new NotFoundException('Variant not found');
+      throw new NotFoundException('Không tìm thấy biến thể');
     }
     return updatedVariant;
   }
@@ -102,5 +102,17 @@ export class ProductService {
       { $pull: { variants: variantId } }
     ).exec();
     await this.variantModel.findByIdAndDelete(variantId).exec();
+  }
+
+  async decreaseStock(variantId: string, quantity: number): Promise<void> {
+    const variant = await this.variantModel.findById(variantId);
+    if (!variant) {
+      throw new NotFoundException('Không tìm thấy biến thể');
+    }
+    if (variant.quantity < quantity) {
+      throw new NotFoundException('Không đủ hàng trong kho');
+    }
+    variant.quantity -= quantity;
+    await variant.save();
   }
 }

@@ -11,6 +11,10 @@ export class UserAddress  {
   @Prop({ type: AddressSchema })
   address: Address;
 
+  @Prop({ required: true }) full_name: string;
+  @Prop({ required: true }) email: string;
+  @Prop({ required: true }) phone: string;
+
   @Prop({ default: false })
   is_default: boolean;
 }

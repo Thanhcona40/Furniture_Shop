@@ -1,16 +1,15 @@
 import { api } from "../config/api";
 
-export const createCartForUser = async (userId) => {
-  const response = await api.post("/carts", { userId });
+export const createCartForUser = async () => {
+  const response = await api.post("/carts");
   return response.data.cartId;
 };
 
-export const getCartIdByUserId = async (userId) => {
+export const getCartIdByUserId = async () => {
   try {
-    const response = await api.get(`/carts/user/${userId}`);
+    const response = await api.get(`/carts/user`);
     return response.data.cartId;
   } catch (error) {
-    // If cart doesn't exist, return null
     return null;
   }
 };
@@ -37,4 +36,14 @@ export const updateCartItemVariant = async (cartItemId, variantId) => {
 
 export const removeCartItem = async (cartItemId) => {
   await api.delete(`/carts/cart-item/${cartItemId}`);
+};
+
+// Xóa toàn bộ cart items
+export const clearCartItems = async (cartId) => {
+  await api.delete(`/carts/cart-item/clear?cartId=${cartId}`);
+};
+
+// Xóa nhiều cart items theo danh sách ID
+export const removeCartItems = async (cartItemIds) => {
+  await api.delete(`/carts/cart-item/batch`, { data: { cartItemIds } });
 };

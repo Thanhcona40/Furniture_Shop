@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { addCartItem, initializeCart } from '../../redux/slices/cartSlice';
+import { addCartItem, initializeCart } from '../../redux/actions/cartActions';
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
@@ -20,18 +20,6 @@ const ProductCard = ({ product }) => {
       return;
     }
 
-    if (!cartId) {
-      try {
-        await dispatch(initializeCart(userId)).unwrap();
-        // Cart will be initialized, but we need to wait for the next render cycle
-        toast.info("Đang khởi tạo giỏ hàng, vui lòng thử lại!");
-        return;
-      } catch (error) {
-        toast.error("Lỗi khởi tạo giỏ hàng!");
-        return;
-      }
-    }
-
     // Get the first variant or use product default
     const firstVariant = product.variants?.[0];
     
@@ -40,15 +28,37 @@ const ProductCard = ({ product }) => {
       return;
     }
 
-    dispatch(
-      addCartItem({
-        cart_id: cartId,
+    try {
+      // Nếu chưa có cartId, khởi tạo cart trước
+      let currentCartId = cartId;
+      if (!currentCartId) {
+        console.log('Initializing cart for user:', userId);
+        currentCartId = await dispatch(initializeCart()).unwrap();
+        console.log('Cart initialized with ID:', currentCartId);
+      }
+
+      console.log('Adding to cart with data:', {
+        cart_id: currentCartId,
         product_id: product._id,
         variant_id: firstVariant._id,
         quantity: 1,
-      })
-    );
-    toast.success("Đã thêm vào giỏ hàng!");
+      });
+
+      // Thêm vào giỏ hàng
+      await dispatch(
+        addCartItem({
+          cart_id: currentCartId,
+          product_id: product._id,
+          variant_id: firstVariant._id,
+          quantity: 1,
+        })
+      ).unwrap();
+      
+      toast.success("Đã thêm vào giỏ hàng!");
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error(error?.message || "Lỗi thêm vào giỏ hàng!");
+    }
   };
 
   const handleViewProduct = (e) => {

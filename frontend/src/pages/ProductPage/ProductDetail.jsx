@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductById } from "../../api/product";
-import { addCartItem, initializeCart } from "../../redux/slices/cartSlice";
+import { addCartItem, initializeCart } from "../../redux/actions/cartActions";
 import { Divider } from "antd";
 
 const ProductDetail = () => {
@@ -43,7 +43,7 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (userId && !cartId && status !== "loading") {
-      dispatch(initializeCart(userId));
+      dispatch(initializeCart());
     }
   }, [userId, cartId, dispatch, status]);
 
@@ -119,7 +119,7 @@ const ProductDetail = () => {
                 key={index}
                 src={image}
                 alt={`${product.name} - Ảnh ${uniqueColors[index]}`}
-                className={`w-20 h-20 object-cover rounded-md cursor-pointer border-2 ${
+                className={`w-24 h-24 object-cover rounded-md cursor-pointer border-2 ${
                   currentVariant.url_media === image || (!currentVariant.url_media && image === product.thumbnail_url)
                     ? "border-primary"
                     : "border-transparent hover:border-gray-300"
@@ -187,14 +187,14 @@ const ProductDetail = () => {
             </div>
             <Divider/>
             <div className="flex items-center gap-3">
-              <label className="block text-lg font-medium text-primary-light mb-2">Số lượng</label>
+              <label className="block text-lg font-medium text-primary-light">Số lượng</label>
               <div className="flex items-center gap-2">
                 <button
                   className="w-8 h-8 flex items-center justify-center border bg-white rounded text-lg font-bold hover:bg-gray-200"
                   onClick={() => setQuantity(q => Math.max(1, q - 1))}
                   type="button"
                 >-</button>
-                <span className="px-6 h-8 text-center bg-white py-auto ">{quantity}</span>
+                <span className="px-6 h-8 flex items-center justify-center  bg-white ">{quantity}</span>
                 <button
                   className="w-8 h-8 flex items-center justify-center border bg-white rounded text-lg font-bold hover:bg-gray-200"
                   onClick={() => setQuantity(q => q + 1)}
@@ -202,9 +202,9 @@ const ProductDetail = () => {
                 >+</button>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Số lượng trong kho</label>
-              <span className="text-lg font-semibold text-green-600">
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium text-gray-700">Số lượng trong kho : </label>
+              <span className="text-lg font-semibold text-primary">
                 {currentVariant.quantity || product.stock_quantity}
               </span>
             </div>

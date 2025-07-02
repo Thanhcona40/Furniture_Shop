@@ -4,6 +4,7 @@ import { Document, Types } from "mongoose";
 
 @Schema({ timestamps: true })
 export class District {
+  @Prop({ required: true, type: String }) _id: string; 
   @Prop({ required: true }) name: string;
   @Prop({ type: Types.ObjectId, ref: 'Province' }) province_id: Province;
 }

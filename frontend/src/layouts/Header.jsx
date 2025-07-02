@@ -7,7 +7,8 @@ import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined
 import HeadsetRoundedIcon from '@mui/icons-material/HeadsetRounded';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/slices/authSlice';
-import { initializeCart, fetchCartItems } from '../redux/slices/cartSlice';
+import { initializeCart, fetchCartItems, clearCartItemsAction } from '../redux/actions/cartActions';
+import { clearCart } from '../redux/slices/cartSlice';
 
 const Header = ({ isTransparent }) => {
     const user = useSelector((state) => state.auth.user)
@@ -21,7 +22,8 @@ const Header = ({ isTransparent }) => {
     // Initialize cart when user is logged in
     useEffect(() => {
         if (user?._id && !cartId) {
-            dispatch(initializeCart(user._id));
+            // Khởi tạo cart nếu chưa có cartId
+            dispatch(initializeCart());
         }
     }, [user, cartId, dispatch]);
 
@@ -29,6 +31,10 @@ const Header = ({ isTransparent }) => {
     
     // Calculate total items in cart
     const cartItemCount = cartItems.reduce((total, item) => total + 1, 0);
+    const handleLogout = () => {
+        dispatch(logout());
+        dispatch(clearCart());
+    }
 
     return (
         <header className={`w-full left-0 z-30 ${isTransparent ? "absolute" : "relative bg-white"}`}>
@@ -60,7 +66,7 @@ const Header = ({ isTransparent }) => {
                             <div className='flex space-x-3 items-center'>
                                 <div className='flex items-center relative'>
                                     <Link
-                                        to="/profile" className="hover:text-primary font-medium"
+                                        to="/account" className="hover:text-primary font-medium"
                                     >
                                         TÀI KHOẢN
                                     </Link>
@@ -68,13 +74,13 @@ const Header = ({ isTransparent }) => {
                                     {openMenu ? 
                                         (
                                         <div className="absolute top-0 left-0 z-10 mt-10 w-48 bg-white shadow-lg border border-gray-200 rounded-md">
-                                            <Link to="/profile" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                            <Link to="/account" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
                                                 Thông tin tài khoản
                                             </Link>
-                                            <Link to="/orders" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                            <Link to="/account/orders-user" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
                                                 Đơn hàng của bạn
                                             </Link>
-                                            <Link to="/wishlist" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                            <Link to="/account/address" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
                                                 Địa chỉ của bạn
                                             </Link>
                                         </div>
@@ -84,7 +90,7 @@ const Header = ({ isTransparent }) => {
                                 <span>|</span>
                                 <p
                                     className='hover:text-primary font-medium cursor-pointer'
-                                    onClick={() => dispatch(logout())}
+                                    onClick={handleLogout}
                                 >
                                     THOÁT
                                 </p>

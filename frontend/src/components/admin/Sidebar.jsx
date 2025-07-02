@@ -9,11 +9,17 @@ import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettin
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/slices/authSlice';
+import { clearCart } from '../../redux/slices/cartSlice';
 
 const Sidebar = () => {
 
   const location = useLocation();
   const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    dispatch(clearCart());
+  }
 
   const navItems = [
     { path: "dashboard", label: "Dashboard", icon: <DashboardOutlinedIcon /> },
@@ -69,7 +75,7 @@ const Sidebar = () => {
           </div>
         </div>
         <div className='ml-10 items-center cursor-pointer'
-          onClick={() => dispatch(logout())}>
+          onClick={handleLogout}>
           <LogoutOutlinedIcon />
         </div>
       </div>

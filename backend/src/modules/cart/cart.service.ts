@@ -15,7 +15,7 @@ export class CartService {
 
     async createCart(userId: string): Promise<string> {
         const findCart = await this.cartModel.findOne({ user_id: userId }).exec();
-        if(findCart) throw new ConflictException('Giỏ hàng đã tồn tại rồi');
+        if(findCart) return findCart._id;
         
         const cart = new this.cartModel({ user_id: userId });
         await cart.save();
@@ -24,11 +24,12 @@ export class CartService {
 
   async getCartIdByUserId(userId: string): Promise<string | null> {
     const cart = await this.cartModel.findOne({ user_id: userId }).exec();
-    if(!cart) throw new NotFoundException('Không tìm thấy giỏ hàng')
     return cart ? cart._id : null;
   }
 
   async addToCart(cartData: Partial<CartItem>): Promise<CartItem> {
+    console.log('Adding to cart with data:', cartData);
+    
     // Check if item already exists in cart with same product and variant
     const existingItem = await this.cartItemModel.findOne({
       cart_id: cartData.cart_id,
@@ -37,11 +38,13 @@ export class CartService {
     }).exec();
 
     if (existingItem) {
+      console.log('Found existing item, updating quantity');
       // Update quantity if item exists
       existingItem.quantity += cartData.quantity || 1;
       return await existingItem.save();
     }
 
+    console.log('Creating new cart item');
     // Create new cart item if it doesn't exist
     const cartItem = new this.cartItemModel(cartData);
     return await cartItem.save();
@@ -134,6 +137,14 @@ export class CartService {
 
   async removeCartItem(cartItemId: string): Promise<void> {
     await this.cartItemModel.findByIdAndDelete(cartItemId).exec();
+  }
+
+  async clearCartItems(cartId: string): Promise<void> {
+    await this.cartItemModel.deleteMany({ cart_id: cartId }).exec();
+  }
+
+  async removeCartItems(cartItemIds: string[]): Promise<void> {
+    await this.cartItemModel.deleteMany({ _id: { $in: cartItemIds } }).exec();
   }
 
   async updateCartItemVariantById(cartItemId: string, variantId: string): Promise<CartItem | null> {

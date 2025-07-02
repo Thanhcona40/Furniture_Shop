@@ -5,6 +5,7 @@ import { Cart, CartSchema } from './schemas/cart.schema';
 import { CartItem, CartItemSchema } from './schemas/cart-item.schema';
 import { VariantProduct, VariantProductSchema } from '../product/schemas/product-variant.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       { name: CartItem.name, schema: CartItemSchema },
       { name: VariantProduct.name, schema: VariantProductSchema }
     ]),
+    AuthModule,
   ],
   providers: [CartService],
   controllers: [CartController]

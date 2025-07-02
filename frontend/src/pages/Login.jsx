@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
 import { GoogleOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
@@ -21,6 +21,11 @@ const validateSchema = Yup.object().shape({
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Clear justLoggedOut flag when component mounts
+  useEffect(() => {
+    sessionStorage.removeItem('justLoggedOut');
+  }, []);
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
