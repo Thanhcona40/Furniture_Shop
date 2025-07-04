@@ -222,4 +222,18 @@ export class OrderService {
     const orderTrack = await this.orderTrackModel.find({ order_id: new Types.ObjectId(orderId) }).sort({ createdAt: 1 });
     return orderTrack;
   }
+
+  async countOrdersByUserAndStatus(userId: string) {
+    const statuses = ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'];
+    const counts = await Promise.all(
+      statuses.map(status =>
+        this.orderModel.countDocuments({ user_id: userId, status })
+      )
+    );
+    const result = {};
+    statuses.forEach((status, idx) => {
+      result[status] = counts[idx];
+    });
+    return result;
+  }
 }

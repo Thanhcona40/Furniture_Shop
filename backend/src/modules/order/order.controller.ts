@@ -53,4 +53,11 @@ export class OrderController {
     if (!order) throw new NotFoundException('Đơn hàng không tồn tại hoặc không thuộc về bạn');
     return this.orderService.getOrderTrackByOrderId(id);
   }
+
+  @Get('user/:userId/status-count')
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
+  async countOrdersByUserAndStatus(@Param('userId') userId: string) {
+    return this.orderService.countOrdersByUserAndStatus(userId);
+  }
 }

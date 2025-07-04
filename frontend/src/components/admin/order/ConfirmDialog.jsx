@@ -4,7 +4,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
-import { statusLabel } from './constants';
+import { statusLabel } from '../../../utils/orderConstants';
 
 const ConfirmDialog = ({ 
   open, 

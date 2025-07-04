@@ -6,7 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
-import { statusColor, statusLabel, nextStatus } from './constants';
+import { statusColor, statusLabel, nextStatus } from '../../../utils/orderConstants';
 
 const OrderDetailModal = ({ 
   open, 

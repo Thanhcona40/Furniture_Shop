@@ -8,7 +8,7 @@ import { Divider } from "antd";
 
 const ProductDetail = () => {
   const dispatch = useDispatch();
-  const { _id: userId } = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth.user);
   const { cartId, status } = useSelector((state) => state.cart);
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState(null);
@@ -42,10 +42,10 @@ const ProductDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    if (userId && !cartId && status !== "loading") {
+    if (user?._id && !cartId && status !== "loading") {
       dispatch(initializeCart());
     }
-  }, [userId, cartId, dispatch, status]);
+  }, [user, cartId, dispatch, status]);
 
   if (loading) return <div>Loading...</div>;
   if (!product) return <div>Sản phẩm không tồn tại</div>;
@@ -68,7 +68,7 @@ const ProductDetail = () => {
   });
 
   const handleAddToCart = () => {
-    if (!userId) {
+    if (!user) {
       toast.error("Vui lòng đăng nhập để thêm vào giỏ hàng!");
       return;
     }

@@ -1,20 +1,6 @@
 import React from 'react';
 import Chip from '@mui/material/Chip';
-
-const statusColor = {
-  pending: 'default',
-  confirmed: 'primary',
-  shipping: 'warning',
-  delivered: 'success',
-  cancelled: 'error'
-};
-const statusLabel = {
-  pending: 'Chờ xác nhận',
-  confirmed: 'Đã xác nhận',
-  shipping: 'Đang giao',
-  delivered: 'Đã giao',
-  cancelled: 'Đã hủy'
-};
+import { statusColor, statusLabel } from '../../utils/orderConstants';
 
 const OrderDetailInfo = ({ address, shippingAddress, subtotal, shippingFee, total, orderTrack = [] }) => (
   <>

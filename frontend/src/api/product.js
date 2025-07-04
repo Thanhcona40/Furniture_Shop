@@ -9,3 +9,6 @@ export const deleteProduct = (id) => api.delete(`/products/${id}`);
 export const addVariant = (productId, data) => api.post(`/products/${productId}/variants`, data);
 export const updateVariant = (variantId, data) => api.put(`/products/variants/${variantId}`, data);
 export const deleteVariant = (variantId) => api.delete(`/products/variants/${variantId}`);
+
+// Search products by keyword
+export const searchProducts = (keyword) => api.get(`/products/search?q=${encodeURIComponent(keyword)}`);

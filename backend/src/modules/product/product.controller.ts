@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -13,6 +13,11 @@ export class ProductController {
   @Get()
   async findAll() {
     return this.productsService.findAll();
+  }
+
+  @Get('search')
+  async search(@Query('q') query: string) {
+    return this.productsService.search(query);
   }
 
   @Get(':id')

@@ -18,7 +18,7 @@ import AdminLayout from './components/admin/AdminLayout';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Dashboard from './components/admin/Dashboard';
-import UserManagement from './components/admin/UserManagement';
+import UserManagement from './components/admin/user/UserManagement';
 import OrderManagement from './components/admin/order/OrderManagement';
 import ProductManagement from './components/admin/product/ProductManagement';
 import CategoryManagement from './components/admin/category/CategoryManagement';

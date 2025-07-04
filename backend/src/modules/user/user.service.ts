@@ -69,4 +69,12 @@ export class UserService {
             address: addressString
         };
     }
+
+    async getAllUsers() {
+        return this.userModel.find().select('-password');
+    }
+
+    async deleteUser(userId: string) {
+        return this.userModel.findByIdAndDelete(userId);
+    }
 }

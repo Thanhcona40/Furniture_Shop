@@ -6,6 +6,7 @@ import { getProvinceNameById, getDistrictNameById, getWardNameById } from '../..
 import { getOrderTrack } from '../../api/order';
 import OrderTable from '../../components/order/OrderTable';
 import OrderDetailModal from '../../components/order/OrderDetailModal';
+import { statusColor, statusLabel } from '../../utils/orderConstants';
 
 const Order = () => {
   const dispatch = useDispatch();
@@ -61,40 +62,6 @@ const Order = () => {
     // eslint-disable-next-line
   }, [orders]);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'pending':
-        return 'orange';
-      case 'confirmed':
-        return 'blue';
-      case 'shipping':
-        return 'purple';
-      case 'delivered':
-        return 'green';
-      case 'cancelled':
-        return 'red';
-      default:
-        return 'default';
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'pending':
-        return 'Chờ xác nhận';
-      case 'confirmed':
-        return 'Đã xác nhận';
-      case 'shipping':
-        return 'Đang giao hàng';
-      case 'delivered':
-        return 'Đã giao hàng';
-      case 'cancelled':
-        return 'Đã hủy';
-      default:
-        return status;
-    }
-  };
-
   const getPaymentText = (order) => {
     if (order.payment_status) {
       if (order.payment_status === 'paid') return 'Đã thanh toán';
@@ -144,8 +111,8 @@ const Order = () => {
           addressCache={addressCache}
           onShowDetail={handleShowDetail}
           onCancelOrder={handleCancelOrder}
-          getStatusColor={getStatusColor}
-          getStatusText={getStatusText}
+          getStatusColor={(status) => statusColor[status] || 'default'}
+          getStatusText={(status) => statusLabel[status] || status}
           getPaymentText={getPaymentText}
         />
       )}

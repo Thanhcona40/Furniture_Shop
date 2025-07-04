@@ -5,9 +5,10 @@ import { ReactComponent as ChairIcon } from '../assets/subnavbar/chair.svg';
 import { ReactComponent as SofaIcon } from '../assets/subnavbar/sofa.svg';
 import { ReactComponent as TableIcon } from '../assets/subnavbar/table.svg';
 import { ReactComponent as ClosetIcon } from '../assets/subnavbar/closet.svg';
+import { useNavigate } from "react-router-dom";
 
-const CategoryMenu = ({setType}) => {
-
+const CategoryMenu = () => {
+    const navigate = useNavigate();
     const categories = [
     { name: 'Sofa', icon: SofaIcon },
     { name: 'Ghế', icon: ChairIcon },
@@ -25,7 +26,7 @@ const CategoryMenu = ({setType}) => {
             <div
               key={cat.name}
               className="group flex flex-col items-center justify-center p-10 px-14 hover:bg-gray-50 border border-gray-100 cursor-pointer perspective-1000"
-              onClick={() => setType(cat.name)}
+              onClick={() => navigate(`/allproducts?category=${encodeURIComponent(cat.name)}`)}
             >
               <div className="flip-icon w-16 h-16 mb-2">
                 <Icon className="w-full h-full" />

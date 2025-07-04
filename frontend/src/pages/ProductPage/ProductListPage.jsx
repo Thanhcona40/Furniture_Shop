@@ -4,11 +4,15 @@ import CategoryMenu from '../../layouts/CategoryMenu';
 import FilterSidebar from '../../components/product/FilterSideBar';
 import {toast} from 'react-toastify'
 import { getProducts } from '../../api/product';
+import { useLocation } from "react-router-dom";
 
 
 const ProductListPage = () => {
   const [loading, setLoading] = useState(false)
-   const [products, setProducts] = useState([])
+  const [products, setProducts] = useState([])
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const category = params.get("category") || "Tất cả sản phẩm";
     
     useEffect(() => {
         if (!products?.length) {
@@ -29,9 +33,8 @@ const ProductListPage = () => {
     }, [products]);
 
   const [filter, setFilter] = useState({ brands: [], prices: []});
-  const [type, setType] = useState("Tất cả sản phẩm");
   const currentProducts = products.filter((product) => {
-    return type === "Tất cả sản phẩm" || product.type === type;
+    return category === "Tất cả sản phẩm" || product.category_id?.name === category;
   })
 
   const filterProducts = () => {
@@ -70,16 +73,16 @@ const ProductListPage = () => {
         <div className="relative max-w-[1110px] mx-auto mb-5"> {/* giống với CategoryMenu */}
             {/* Category Menu nằm ở trên, căn giữa theo 1200px */}
             <div className="absolute left-1/2 -translate-x-1/2 -top-20 flex w-max text-center z-10 bg-white">
-                <CategoryMenu setType={setType}/>
+                <CategoryMenu />
             </div>
             <div className="flex gap-6 pt-32">
             {/* Nội dung chính bên dưới */}
             <div className="w-1/4">
-                <FilterSidebar setType={setType} onChange={setFilter} />
+                <FilterSidebar onChange={setFilter} />
             </div>
             <div className="w-3/4">
-                <h1 className="text-2xl font-bold mb-4">{type}</h1>
-                <div className="grid grid-cols-4 gap-4">
+                <h1 className="text-2xl font-bold mb-4 ml-5">{category}</h1>
+                <div className="grid grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4">
                     {filterProducts().map((item) => (
                         <ProductCard key={item.id} product={item} />
                     ))}

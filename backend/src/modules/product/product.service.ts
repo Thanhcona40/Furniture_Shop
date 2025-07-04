@@ -115,4 +115,37 @@ export class ProductService {
     variant.quantity -= quantity;
     await variant.save();
   }
+
+  async search(keyword: string): Promise<Product[]> {
+    if (!keyword || keyword.trim() === '') {
+      return this.findAll();
+    }
+
+    const searchRegex = new RegExp(keyword, 'i'); // Case-insensitive search
+    
+    const products = await this.productModel
+      .find({
+        $or: [
+          { name: searchRegex },
+          { description: searchRegex }
+        ]
+      })
+      .populate('category_id', '_id name')
+      .populate('variants')
+      .exec();
+
+    // Filter by category name if keyword matches category
+    const categorySearchRegex = new RegExp(keyword, 'i');
+    const categoryFiltered = products.filter(product => {
+      const categoryName = product.category_id?.name;
+      return categoryName && categorySearchRegex.test(categoryName);
+    });
+
+    // If we found products by category name, return those
+    if (categoryFiltered.length > 0) {
+      return categoryFiltered;
+    }
+
+    return products;
+  }
 }

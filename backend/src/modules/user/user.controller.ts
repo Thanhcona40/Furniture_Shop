@@ -1,4 +1,4 @@
-import { Controller, Put, Body, UseGuards, Request, Get } from '@nestjs/common';
+import { Controller, Put, Body, UseGuards, Request, Get, Delete, Param } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,5 +19,15 @@ export class UserController {
   async updateProfile(@Request() req, @Body() updateUserDto: UpdateUserDto) {
     const userId = req.user.user_id;
     return this.userService.updateUser(userId, updateUserDto);
+  }
+
+  @Get()
+  async getAllUsers() {
+    return this.userService.getAllUsers();
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    return this.userService.deleteUser(id);
   }
 }
