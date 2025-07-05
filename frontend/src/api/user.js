@@ -14,3 +14,8 @@ export const fetchUserOrderStatusCount = async (userId) => {
   const res = await api.get(`/orders/user/${userId}/status-count`);
   return res.data;
 }; 
+
+export const getDashboardSummary = async () => {
+  const res = await api.get('/admin/dashboard/summary');
+  return res.data;
+}; 

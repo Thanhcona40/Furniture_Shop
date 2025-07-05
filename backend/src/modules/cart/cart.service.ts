@@ -7,20 +7,20 @@ import { VariantProduct, VariantProductDocument } from '../product/schemas/produ
 
 @Injectable()
 export class CartService {
-    constructor(
-      @InjectModel(Cart.name) private cartModel: Model<CartDocument>,
-      @InjectModel(CartItem.name) private cartItemModel: Model<CartItemDocument>,
-      @InjectModel(VariantProduct.name) private variantModel: Model<VariantProductDocument>
-    ){}
+  constructor(
+    @InjectModel(Cart.name) private cartModel: Model<CartDocument>,
+    @InjectModel(CartItem.name) private cartItemModel: Model<CartItemDocument>,
+    @InjectModel(VariantProduct.name) private variantModel: Model<VariantProductDocument>
+  ){}
 
-    async createCart(userId: string): Promise<string> {
-        const findCart = await this.cartModel.findOne({ user_id: userId }).exec();
-        if(findCart) return findCart._id;
-        
-        const cart = new this.cartModel({ user_id: userId });
-        await cart.save();
-        return cart._id;
-    }
+  async createCart(userId: string): Promise<string> {
+    const findCart = await this.cartModel.findOne({ user_id: userId }).exec();
+    if(findCart) return findCart._id;
+    
+    const cart = new this.cartModel({ user_id: userId });
+    await cart.save();
+    return cart._id;
+  }
 
   async getCartIdByUserId(userId: string): Promise<string | null> {
     const cart = await this.cartModel.findOne({ user_id: userId }).exec();
@@ -28,24 +28,24 @@ export class CartService {
   }
 
   async addToCart(cartData: Partial<CartItem>): Promise<CartItem> {
-    console.log('Adding to cart with data:', cartData);
-    
-    // Check if item already exists in cart with same product and variant
-    const existingItem = await this.cartItemModel.findOne({
+    const query: any = {
       cart_id: cartData.cart_id,
-      product_id: cartData.product_id,
-      variant_id: cartData.variant_id
-    }).exec();
+      product_id: cartData.product_id
+    };
+    
+    if (cartData.variant_id) {
+      query.variant_id = cartData.variant_id;
+    } else {
+      query.variant_id = { $exists: false };
+    }
+
+    const existingItem = await this.cartItemModel.findOne(query).exec();
 
     if (existingItem) {
-      console.log('Found existing item, updating quantity');
-      // Update quantity if item exists
       existingItem.quantity += cartData.quantity || 1;
       return await existingItem.save();
     }
 
-    console.log('Creating new cart item');
-    // Create new cart item if it doesn't exist
     const cartItem = new this.cartItemModel(cartData);
     return await cartItem.save();
   }
@@ -57,7 +57,11 @@ export class CartService {
         select: 'name thumbnail_url price variants',
         populate: { path: 'variants', select: 'color dimensions price quantity url_media' }
       })
-      .populate('variant_id', 'color dimensions price quantity url_media')
+      .populate({
+        path: 'variant_id',
+        select: 'color dimensions price quantity url_media',
+        options: { strictPopulate: false }
+      })
       .exec();
   }
 
@@ -69,7 +73,11 @@ export class CartService {
 
     const updatedItem = await this.cartItemModel.findByIdAndUpdate(cartItemId, updateData, { new: true })
       .populate('product_id', 'name thumbnail_url price')
-      .populate('variant_id', 'color dimensions price quantity url_media')
+      .populate({
+        path: 'variant_id',
+        select: 'color dimensions price quantity url_media',
+        options: { strictPopulate: false }
+      })
       .exec();
 
     if (!updatedItem) {
@@ -114,7 +122,11 @@ export class CartService {
       await this.cartItemModel.findByIdAndDelete(cartItemId).exec();
       return await this.cartItemModel.findById(duplicateItem._id)
         .populate('product_id', 'name thumbnail_url price')
-        .populate('variant_id', 'color dimensions price quantity url_media')
+        .populate({
+          path: 'variant_id',
+          select: 'color dimensions price quantity url_media',
+          options: { strictPopulate: false }
+        })
         .exec();
     }
 
@@ -125,7 +137,11 @@ export class CartService {
       { new: true }
     )
       .populate('product_id', 'name thumbnail_url price')
-      .populate('variant_id', 'color dimensions price quantity url_media')
+      .populate({
+        path: 'variant_id',
+        select: 'color dimensions price quantity url_media',
+        options: { strictPopulate: false }
+      })
       .exec();
 
     if (!updatedItem) {
@@ -165,7 +181,11 @@ export class CartService {
       await this.cartItemModel.findByIdAndDelete(cartItemId).exec();
       return await this.cartItemModel.findById(duplicateItem._id)
         .populate('product_id', 'name thumbnail_url price variants')
-        .populate('variant_id', 'color dimensions price quantity url_media')
+        .populate({
+          path: 'variant_id',
+          select: 'color dimensions price quantity url_media',
+          options: { strictPopulate: false }
+        })
         .exec();
     }
 
@@ -176,7 +196,11 @@ export class CartService {
       { new: true }
     )
       .populate('product_id', 'name thumbnail_url price variants')
-      .populate('variant_id', 'color dimensions price quantity url_media')
+      .populate({
+        path: 'variant_id',
+        select: 'color dimensions price quantity url_media',
+        options: { strictPopulate: false }
+      })
       .exec();
 
     if (!updatedItem) throw new NotFoundException('Không thể cập nhật biến thể cho mục giỏ hàng');

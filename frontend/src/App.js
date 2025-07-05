@@ -17,7 +17,7 @@ import Checkout from './pages/Checkout';
 import AdminLayout from './components/admin/AdminLayout';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Dashboard from './components/admin/Dashboard';
+import Dashboard from './components/admin/dashboard/Dashboard';
 import UserManagement from './components/admin/user/UserManagement';
 import OrderManagement from './components/admin/order/OrderManagement';
 import ProductManagement from './components/admin/product/ProductManagement';
@@ -46,7 +46,7 @@ function App() {
             <AdminLayout />
           </AdminRoute>
         }>
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route index element={<Dashboard />} />
           <Route path="users" element={<UserManagement />} />
           <Route path="products" element={<ProductManagement />} />
           <Route path="categories" element={<CategoryManagement />} />

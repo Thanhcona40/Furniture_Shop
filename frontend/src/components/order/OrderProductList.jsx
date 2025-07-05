@@ -13,7 +13,9 @@ const OrderProductList = ({ items }) => (
           />
           <div className="flex-1">
             <div className="font-medium">{item.product_id?.name}</div>
-            <div className="text-xs text-gray-500">{item.variant_id?.color} - {item.variant_id?.dimensions}</div>
+            <div className="text-xs text-gray-500">
+              {item.variant_id ? `${item.variant_id.color} - ${item.variant_id.dimensions}` : ''}
+            </div>
             <div className="text-xs text-gray-500">Số lượng: {item.quantity}</div>
           </div>
           <div className="text-right font-medium">{item.total.toLocaleString('vi-VN')}đ</div>

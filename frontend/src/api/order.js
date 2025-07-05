@@ -12,9 +12,10 @@ export const createOrder = async (orderData) => {
 };
 
 // Lấy danh sách đơn hàng của user
-export const getUserOrders = async () => {
+export const getUserOrders = async (status = 'all') => {
   try {
-    const response = await api.get('/orders/user');
+    const params = status && status !== 'all' ? { status } : {};
+    const response = await api.get('/orders/user', { params });
     return response.data;
   } catch (error) {
     throw error;
@@ -42,8 +43,9 @@ export const cancelOrder = async (orderId) => {
 };
 
 // Admin: Lấy tất cả đơn hàng
-export const getAllOrders = async (params = {}) => {
+export const getAllOrders = async (status = 'all') => {
   try {
+    const params = status && status !== 'all' ? { status } : {};
     const response = await api.get('/orders', { params });
     return response.data;
   } catch (error) {

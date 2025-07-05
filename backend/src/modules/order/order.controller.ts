@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request, NotFoundException, Query } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -17,8 +17,8 @@ export class OrderController {
   }
 
   @Get('user')
-  async getUserOrders(@Request() req) {
-    return this.orderService.getUserOrders(req.user.user_id);
+  async getUserOrders(@Request() req, @Query('status') status?: string) {
+    return this.orderService.getUserOrders(req.user.user_id, status);
   }
 
   @Get(':id')
@@ -35,8 +35,8 @@ export class OrderController {
   @Get()
   @UseGuards(RolesGuard)
   @Roles(Role.Admin)
-  async getAllOrders() {
-    return this.orderService.getAllOrders();
+  async getAllOrders(@Query('status') status?: string) {
+    return this.orderService.getAllOrders(status);
   }
 
   @Put(':id/status')

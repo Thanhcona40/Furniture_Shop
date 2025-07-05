@@ -22,7 +22,7 @@ const Sidebar = () => {
   }
 
   const navItems = [
-    { path: "dashboard", label: "Dashboard", icon: <DashboardOutlinedIcon /> },
+    { path: "", label: "Dashboard", icon: <DashboardOutlinedIcon /> },
     { path: "users", label: "Quản lý Người dùng", icon: <GroupOutlinedIcon /> },
     { path: "products", label: "Quản lý Sản phẩm", icon: <BedOutlinedIcon /> },
     { path: "categories", label: "Quản lý Danh mục", icon: <CategoryOutlinedIcon /> },

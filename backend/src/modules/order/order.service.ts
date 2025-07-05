@@ -68,8 +68,13 @@ export class OrderService {
           price: item.price,
           total: item.quantity * item.price
         });
-        // Giảm stock cho variant
-        await this.productService.decreaseStock(item.variant_id, item.quantity);
+        // Giảm stock cho variant hoặc product
+        if (item.variant_id) {
+          await this.productService.decreaseStock(item.variant_id, item.quantity);
+        } else {
+          // Nếu không có variant, giảm stock của product
+          await this.productService.decreaseProductStock(item.product_id, item.quantity);
+        }
         return await orderItem.save();
       })
     );
@@ -103,7 +108,10 @@ export class OrderService {
         path: 'items',
         populate: [
           { path: 'product_id' },
-          { path: 'variant_id' }
+          { 
+            path: 'variant_id',
+            options: { strictPopulate: false }
+          }
         ]
       })
       .populate('user_id', 'full_name email phone');
@@ -116,13 +124,18 @@ export class OrderService {
     return `DH${timestamp.slice(-8)}${random}`;
   }
 
-  async getUserOrders(userId: string) {
-    return await this.orderModel.find({ user_id: userId })
+  async getUserOrders(userId: string, status?: string) {
+    const filter: any = { user_id: userId };
+    if (status && status !== 'all') filter.status = status;
+    return await this.orderModel.find(filter)
       .populate({
         path: 'items',
         populate: [
           { path: 'product_id' },
-          { path: 'variant_id' }
+          { 
+            path: 'variant_id',
+            options: { strictPopulate: false }
+          }
         ]
       })
       .sort({ createdAt: -1 });
@@ -137,7 +150,10 @@ export class OrderService {
           path: 'items',
           populate: [
             { path: 'product_id' },
-            { path: 'variant_id' }
+            { 
+              path: 'variant_id',
+              options: { strictPopulate: false }
+            }
           ]
         })
         .populate('user_id', 'full_name email phone');
@@ -148,7 +164,10 @@ export class OrderService {
           path: 'items',
           populate: [
             { path: 'product_id' },
-            { path: 'variant_id' }
+            { 
+              path: 'variant_id',
+              options: { strictPopulate: false }
+            }
           ]
         })
         .populate('user_id', 'full_name email phone');
@@ -184,13 +203,18 @@ export class OrderService {
     return order;
   }
 
-  async getAllOrders() {
-    return await this.orderModel.find()
+  async getAllOrders(status?: string) {
+    const filter: any = {};
+    if (status && status !== 'all') filter.status = status;
+    return await this.orderModel.find(filter)
       .populate({
         path: 'items',
         populate: [
           { path: 'product_id' },
-          { path: 'variant_id' }
+          { 
+            path: 'variant_id',
+            options: { strictPopulate: false }
+          }
         ]
       })
       .populate('user_id', 'full_name email phone')

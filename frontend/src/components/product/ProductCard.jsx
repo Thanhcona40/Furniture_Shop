@@ -20,14 +20,6 @@ const ProductCard = ({ product }) => {
       return;
     }
 
-    // Get the first variant or use product default
-    const firstVariant = product.variants?.[0];
-    
-    if (!firstVariant) {
-      toast.error("Sản phẩm này không có biến thể!");
-      return;
-    }
-
     try {
       // Nếu chưa có cartId, khởi tạo cart trước
       let currentCartId = cartId;
@@ -35,23 +27,27 @@ const ProductCard = ({ product }) => {
         currentCartId = await dispatch(initializeCart()).unwrap();
         console.log('Cart initialized with ID:', currentCartId);
       }
-
-      console.log('Adding to cart with data:', {
-        cart_id: currentCartId,
-        product_id: product._id,
-        variant_id: firstVariant._id,
-        quantity: 1,
-      });
-
-      // Thêm vào giỏ hàng
-      await dispatch(
-        addCartItem({
+      const hasVariants = product.variants && product.variants.length > 0;
+      
+      let cartItemData;
+      if (hasVariants) {
+        const firstVariant = product.variants[0];
+        cartItemData = {
           cart_id: currentCartId,
           product_id: product._id,
           variant_id: firstVariant._id,
           quantity: 1,
-        })
-      ).unwrap();
+        };
+      } else {
+        cartItemData = {
+          cart_id: currentCartId,
+          product_id: product._id,
+          quantity: 1,
+        };
+      }
+
+      console.log('Adding to cart with data:', cartItemData);
+      await dispatch(addCartItem(cartItemData)).unwrap();
       
       toast.success("Đã thêm vào giỏ hàng!");
     } catch (error) {
@@ -66,16 +62,13 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div className="group relative overflow-hidden transition-all flex flex-col items-center justify-center">
+    <div className="group relative overflow-hidden max-h-[250px] transition-all flex flex-col items-center justify-center">
       {/* Image + overlay icons */}
-      <div className="relative h-44 overflow-hidden inline-block">
+      <div className="relative h-full overflow-hidden inline-block">
         <img
           src={product.thumbnail_url}
           alt={product.name}
           className="w-full h-full object-contain bg-white"
-          onError={(e) => {
-            e.target.src = '/placeholder.jpg'; // Fallback image
-          }}
         />
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
@@ -99,9 +92,16 @@ const ProductCard = ({ product }) => {
 
       {/* Product info */}
       <div className="p-3">
-        <h4 className="text-gray-800 font-medium text-sm line-clamp-2 mb-2">{product.name}</h4>
-        <p className="text-primary font-medium">
-          {product.price?.toLocaleString('vi-VN')}
+        <h4 className="text-gray-800 font-medium text-xs line-clamp-2 mb-2">{product.name}</h4>
+        <p className="text-primary font-medium text-center">
+          {(() => {
+            // Nếu có variants, hiển thị giá của variant đầu tiên
+            if (product.variants && product.variants.length > 0) {
+              return product.variants[0].price?.toLocaleString('vi-VN') || product.price?.toLocaleString('vi-VN');
+            }
+            // Nếu không có variants, hiển thị giá của product
+            return product.price?.toLocaleString('vi-VN');
+          })()}
           <span className="text-xs inline-block ml-1 relative -top-1 underline"> đ</span>
         </p>
       </div>

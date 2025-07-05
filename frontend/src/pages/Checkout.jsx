@@ -28,7 +28,7 @@ const Checkout = () => {
 
   // Tính tổng tiền chỉ cho các sản phẩm được chọn
   const subtotal = selectedCartItems.reduce(
-    (sum, item) => sum + item.quantity * (item.variant_id?.price || 0),
+    (sum, item) => sum + item.quantity * (item.variant_id?.price || item.product_id?.price || 0),
     0
   );
   const shippingFee = 30000; // Phí vận chuyển cố định
@@ -94,7 +94,7 @@ const Checkout = () => {
       const orderData = {
         items: selectedCartItems.map(item => ({
           product_id: item.product_id._id,
-          variant_id: item.variant_id._id,
+          variant_id: item.variant_id?._id || null,
           quantity: item.quantity,
           price: item.variant_id?.price || item.product_id.price
         })),
@@ -189,7 +189,7 @@ const Checkout = () => {
                     <div className="flex-1">
                       <h3 className="font-medium text-sm">{item.product_id?.name}</h3>
                       <p className="text-xs text-gray-500">
-                        {item.variant_id?.color} - {item.variant_id?.dimensions}
+                        {item.variant_id ? `${item.variant_id.color} - ${item.variant_id.dimensions}` : 'Không có biến thể'}
                       </p>
                       <p className="text-xs text-gray-500">Số lượng: {item.quantity}</p>
                     </div>

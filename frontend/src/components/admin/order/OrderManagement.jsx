@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-
+import { Tabs, Tab } from '@mui/material'
 import { getAllOrders, getOrderById, getOrderTrack, updateOrderStatus } from '../../../api/order';
+import { ORDER_STATUS_TABS } from '../../../utils/orderConstants';
 import AdminOrderTable from './AdminOrderTable';
 import OrderDetailModal from './OrderDetailModal';
 import ConfirmDialog from './ConfirmDialog';
@@ -18,12 +19,13 @@ const OrderManagement = () => {
   const [confirmType, setConfirmType] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [pendingStatus, setPendingStatus] = useState(null);
+  const [status, setStatus] = useState('all');
 
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const data = await getAllOrders();
+        const data = await getAllOrders(status);
         setOrders(data);
       } catch (err) {
         setSnackbar({ open: true, message: 'Lỗi tải danh sách đơn hàng', severity: 'error' });
@@ -32,7 +34,7 @@ const OrderManagement = () => {
       }
     };
     fetchOrders();
-  }, []);
+  }, [status]);
 
   const handleViewDetail = async (orderId) => {
     setModalLoading(true);
@@ -89,6 +91,18 @@ const OrderManagement = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Quản lý Đơn hàng</h1>
+      
+      <Tabs
+        value={status}
+        onChange={(e, newValue) => setStatus(newValue)}
+        variant="scrollable"
+        scrollButtons="auto"
+        sx={{ mb: 2 }}
+      >
+        {ORDER_STATUS_TABS.map(tab => (
+          <Tab key={tab.value} label={tab.label} value={tab.value} />
+        ))}
+      </Tabs>
       
       <AdminOrderTable 
         orders={orders} 

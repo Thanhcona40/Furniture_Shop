@@ -116,6 +116,18 @@ export class ProductService {
     await variant.save();
   }
 
+  async decreaseProductStock(productId: string, quantity: number): Promise<void> {
+    const product = await this.productModel.findById(productId);
+    if (!product) {
+      throw new NotFoundException('Không tìm thấy sản phẩm');
+    }
+    if (product.stock_quantity < quantity) {
+      throw new NotFoundException('Không đủ hàng trong kho');
+    }
+    product.stock_quantity -= quantity;
+    await product.save();
+  }
+
   async search(keyword: string): Promise<Product[]> {
     if (!keyword || keyword.trim() === '') {
       return this.findAll();

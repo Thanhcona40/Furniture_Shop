@@ -19,3 +19,12 @@ export const nextStatus = {
   confirmed: 'shipping',
   shipping: 'delivered',
 }; 
+
+export const ORDER_STATUS_TABS = [
+  { label: 'Tất cả', value: 'all' },
+  { label: 'Chờ xác nhận', value: 'pending' },
+  { label: 'Đã xác nhận', value: 'confirmed' },
+  { label: 'Đang giao', value: 'shipping' },
+  { label: 'Đã nhận', value: 'delivered' },
+  { label: 'Đã hủy', value: 'cancelled' },
+];

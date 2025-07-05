@@ -17,9 +17,9 @@ export const createOrderAction = createAsyncThunk(
 // Lấy danh sách đơn hàng của user
 export const fetchUserOrders = createAsyncThunk(
   'order/fetchUserOrders',
-  async (_, { rejectWithValue }) => {
+  async (status = 'all', { rejectWithValue }) => {
     try {
-      const response = await getUserOrders();
+      const response = await getUserOrders(status);
       return response;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Có lỗi xảy ra khi tải đơn hàng');

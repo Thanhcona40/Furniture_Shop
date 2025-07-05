@@ -78,7 +78,7 @@ const Cart = () => {
   // Tính tổng tiền chỉ cho các sản phẩm được chọn
   const selectedCartItems = cartItems.filter(item => selectedItems.has(item._id));
   const total = selectedCartItems.reduce(
-    (sum, item) => sum + item.quantity * (item.variant_id?.price || 0),
+    (sum, item) => sum + item.quantity * (item.variant_id?.price || item.product_id?.price || 0),
     0
   );
 
@@ -149,45 +149,47 @@ const Cart = () => {
                     />
                     <div>
                       <p className="text-gray-800 font-semibold">{item.product_id?.name}</p>
-                      {/* Chọn lại biến thể */}
-                      <div className="flex flex-col gap-1">
-                        <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Chọn màu</label>
-                          <div className="flex gap-1 flex-wrap">
-                            {colors.map((color) => (
-                              <button
-                                key={color}
-                                onClick={() => handleSelectVariant(item._id, color, selectedDimensions)}
-                                className={`px-2 py-1 text-xs border rounded ${
-                                  selectedColor === color
-                                    ? "bg-primary text-white"
-                                    : "bg-white text-gray-700 hover:bg-gray-100"
-                                }`}
-                              >
-                                {color}
-                              </button>
-                            ))}
+                      {/* Chọn lại biến thể - chỉ hiển thị khi có variants */}
+                      {variants.length > 0 && (
+                        <div className="flex flex-col gap-1">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Chọn màu</label>
+                            <div className="flex gap-1 flex-wrap">
+                              {colors.map((color) => (
+                                <button
+                                  key={color}
+                                  onClick={() => handleSelectVariant(item._id, color, selectedDimensions)}
+                                  className={`px-2 py-1 text-xs border rounded ${
+                                    selectedColor === color
+                                      ? "bg-primary text-white"
+                                      : "bg-white text-gray-700 hover:bg-gray-100"
+                                  }`}
+                                >
+                                  {color}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">Chọn kích thước</label>
+                            <div className="flex gap-1 flex-wrap">
+                              {dimensions.map((dimension) => (
+                                <button
+                                  key={dimension}
+                                  onClick={() => handleSelectVariant(item._id, selectedColor, dimension)}
+                                  className={`px-2 py-1 text-xs border rounded ${
+                                    selectedDimensions === dimension
+                                      ? "bg-primary text-white"
+                                      : "bg-white text-gray-700 hover:bg-gray-100"
+                                  }`}
+                                >
+                                  {dimension}
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                        <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">Chọn kích thước</label>
-                          <div className="flex gap-1 flex-wrap">
-                            {dimensions.map((dimension) => (
-                              <button
-                                key={dimension}
-                                onClick={() => handleSelectVariant(item._id, selectedColor, dimension)}
-                                className={`px-2 py-1 text-xs border rounded ${
-                                  selectedDimensions === dimension
-                                    ? "bg-primary text-white"
-                                    : "bg-white text-gray-700 hover:bg-gray-100"
-                                }`}
-                              >
-                                {dimension}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </span>
                   <div className="flex w-1/2 pt-4 justify-between items-center">

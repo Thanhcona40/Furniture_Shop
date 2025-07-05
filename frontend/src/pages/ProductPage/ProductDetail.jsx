@@ -27,7 +27,7 @@ const ProductDetail = () => {
           variants: response.data.variants || [],
         };
         setProduct(updatedProduct);
-        if (updatedProduct.variants.length > 0) {
+        if (updatedProduct.variants && updatedProduct.variants.length > 0) {
           const firstVariant = updatedProduct.variants[0];
           setSelectedColor(firstVariant.color);
           setSelectedDimensions(firstVariant.dimensions);
@@ -50,18 +50,24 @@ const ProductDetail = () => {
   if (loading) return <div>Loading...</div>;
   if (!product) return <div>Sản phẩm không tồn tại</div>;
 
-  const filteredVariants = product.variants.filter(
-    (variant) =>
-      (!selectedColor || variant.color === selectedColor) &&
-      (!selectedDimensions || variant.dimensions === selectedDimensions)
-  );
+  const filteredVariants = product.variants && product.variants.length > 0 
+    ? product.variants.filter(
+        (variant) =>
+          (!selectedColor || variant.color === selectedColor) &&
+          (!selectedDimensions || variant.dimensions === selectedDimensions)
+      )
+    : [];
 
   const currentVariant = filteredVariants.length > 0
     ? filteredVariants[0]
     : product;
 
-  const uniqueColors = [...new Set(product.variants.map((v) => v.color))];
-  const uniqueDimensions = [...new Set(product.variants.map((v) => v.dimensions))];
+  const uniqueColors = product.variants && product.variants.length > 0 
+    ? [...new Set(product.variants.map((v) => v.color))]
+    : [];
+  const uniqueDimensions = product.variants && product.variants.length > 0 
+    ? [...new Set(product.variants.map((v) => v.dimensions))]
+    : [];
   const uniqueImages = uniqueColors.map((color) => {
     const variant = product.variants.find((v) => v.color === color);
     return variant?.url_media || product.thumbnail_url;
@@ -78,29 +84,43 @@ const ProductDetail = () => {
       return;
     }
 
-    if (!selectedColor || !selectedDimensions) {
-      toast.error("Vui lòng chọn màu sắc và kích thước!");
-      return;
+    // Check if product has variants
+    if (product.variants && product.variants.length > 0) {
+      // Product has variants, require color and dimensions selection
+      if (!selectedColor || !selectedDimensions) {
+        toast.error("Vui lòng chọn màu sắc và kích thước!");
+        return;
+      }
+
+      // Find the selected variant
+      const selectedVariant = product.variants.find(
+        variant => variant.color === selectedColor && variant.dimensions === selectedDimensions
+      );
+
+      if (!selectedVariant) {
+        toast.error("Không tìm thấy biến thể đã chọn!");
+        return;
+      }
+
+      dispatch(
+        addCartItem({
+          cart_id: cartId,
+          product_id: product._id,
+          variant_id: selectedVariant._id,
+          quantity: quantity,
+        })
+      );
+    } else {
+      // Product has no variants, add directly to cart
+      dispatch(
+        addCartItem({
+          cart_id: cartId,
+          product_id: product._id,
+          quantity: quantity,
+        })
+      );
     }
-
-    // Find the selected variant
-    const selectedVariant = product.variants.find(
-      variant => variant.color === selectedColor && variant.dimensions === selectedDimensions
-    );
-
-    if (!selectedVariant) {
-      toast.error("Không tìm thấy biến thể đã chọn!");
-      return;
-    }
-
-    dispatch(
-      addCartItem({
-        cart_id: cartId,
-        product_id: product._id,
-        variant_id: selectedVariant._id,
-        quantity: quantity,
-      })
-    );
+    
     toast.success("Đã thêm vào giỏ hàng!");
   };
 
@@ -108,11 +128,14 @@ const ProductDetail = () => {
     <div className="my-5 mx-auto max-w-[1110px] grid grid-cols-2 gap-8">
       <div className="relative">
         <img
-          src={currentVariant.url_media || product.thumbnail_url}
+          src={product.variants && product.variants.length > 0 
+            ? (currentVariant.url_media || product.thumbnail_url)
+            : product.thumbnail_url
+          }
           alt={product.name}
           className="object-cover w-full h-[500px] rounded-lg shadow-md"
         />
-        {uniqueImages.length > 0 && (
+        {product.variants && product.variants.length > 0 && uniqueImages.length > 0 && (
           <div className="mt-4 flex gap-2 overflow-x-auto">
             {uniqueImages.map((image, index) => (
               <img
@@ -151,40 +174,44 @@ const ProductDetail = () => {
           <p className="text-gray-600">{product.description}</p>
           <span className="border border-b w-full"></span>
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Màu sắc</label>
-              <div className="flex gap-2">
-                {uniqueColors.map((color) => (
-                  <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    className={`px-4 py-2 border rounded-md ${
-                      selectedColor === color ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    {color}
-                  </button>
-                ))}
-                {!uniqueColors.length && <span className="text-gray-400">Không có màu sắc</span>}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Kích thước</label>
-              <div className="flex gap-2">
-                {uniqueDimensions.map((dimension) => (
-                  <button
-                    key={dimension}
-                    onClick={() => setSelectedDimensions(dimension)}
-                    className={`px-4 py-2 border rounded-md ${
-                      selectedDimensions === dimension ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    {dimension}
-                  </button>
-                ))}
-                {!uniqueDimensions.length && <span className="text-gray-400">Không có kích thước</span>}
-              </div>
-            </div>
+            {product.variants && product.variants.length > 0 && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Màu sắc</label>
+                  <div className="flex gap-2">
+                    {uniqueColors.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => setSelectedColor(color)}
+                        className={`px-4 py-2 border rounded-md ${
+                          selectedColor === color ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        {color}
+                      </button>
+                    ))}
+                    {!uniqueColors.length && <span className="text-gray-400">Không có màu sắc</span>}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Kích thước</label>
+                  <div className="flex gap-2">
+                    {uniqueDimensions.map((dimension) => (
+                      <button
+                        key={dimension}
+                        onClick={() => setSelectedDimensions(dimension)}
+                        className={`px-4 py-2 border rounded-md ${
+                          selectedDimensions === dimension ? "bg-primary text-white" : "bg-white text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        {dimension}
+                      </button>
+                    ))}
+                    {!uniqueDimensions.length && <span className="text-gray-400">Không có kích thước</span>}
+                  </div>
+                </div>
+              </>
+            )}
             <Divider/>
             <div className="flex items-center gap-3">
               <label className="block text-lg font-medium text-primary-light">Số lượng</label>
@@ -205,7 +232,10 @@ const ProductDetail = () => {
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium text-gray-700">Số lượng trong kho : </label>
               <span className="text-lg font-semibold text-primary">
-                {currentVariant.quantity || product.stock_quantity}
+                {product.variants && product.variants.length > 0 
+                  ? (currentVariant.quantity || 0)
+                  : (product.stock_quantity || 0)
+                }
               </span>
             </div>
           </div>
