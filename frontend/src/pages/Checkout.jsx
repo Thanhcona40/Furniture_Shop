@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import AddressForm from '../components/profile/AddressForm';
 import { createOrderAction } from '../redux/actions/orderActions';
 import { removeCartItemsAction } from '../redux/actions/cartActions';
-import { getDefaultAddress } from '../api/address';
+import { getDefaultAddress, getUserAddresses } from '../api/address';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -21,6 +21,7 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [loading, setLoading] = useState(false);
   const [defaultAddress, setDefaultAddress] = useState(null);
+  const [addressList, setAddressList] = useState([]);
 
   // Lấy danh sách sản phẩm được chọn từ Cart
   const selectedItemIds = location.state?.selectedItems || [];
@@ -67,6 +68,9 @@ const Checkout = () => {
       getDefaultAddress()
         .then(res => setDefaultAddress(res.data))
         .catch(() => setDefaultAddress(null));
+      getUserAddresses()
+        .then(res => setAddressList(res.data))
+        .catch(() => setAddressList([]));
     }
   }, [user]);
 
@@ -135,6 +139,7 @@ const Checkout = () => {
                   <AddressForm 
                     onChange={handleAddressChange}
                     defaultAddress={defaultAddress}
+                    addressList={addressList}
                   />
                 </div>
               </div>

@@ -60,7 +60,7 @@ function App() {
           <Route path='account' element={<PrivateRoute><ProfilePageLayout /></PrivateRoute>}>
             <Route index element={<Profile />} />
             <Route path='address' element={<AddressPage />} />
-            <Route path='orders-user' element={<Order />} />
+            <Route path='orders_user' element={<Order />} />
           </Route>
           <Route path='search' element={<SearchPage />} />
           <Route path='contact' element={<Contact />} />

@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 
 const menuItems = [
   { label: 'Thông tin tài khoản', path: '' },
-  { label: 'Đơn hàng của bạn', path: 'orders-user' },
+  { label: 'Đơn hàng của bạn', path: 'orders_user' },
   { label: 'Sổ địa chỉ', path: 'address' },
 ];
 

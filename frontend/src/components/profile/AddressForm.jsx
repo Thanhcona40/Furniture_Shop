@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -8,7 +9,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { getProvinces, getDistricts, getWards } from '../../api/address';
 
-const AddressForm = ({ defaultAddress, onChange }) => {
+const AddressForm = ({ defaultAddress, onChange, addressList }) => {
+  const location = useLocation();
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -21,34 +23,48 @@ const AddressForm = ({ defaultAddress, onChange }) => {
     district_id: '',
     ward_id: '',
     is_default: false,
+    _id: ''
   });
 
-  // Fetch provinces on mount
+  // Load provinces on mount
   useEffect(() => {
     getProvinces().then(res => setProvinces(res.data));
   }, []);
 
-  // Fetch districts khi province_id thay đổi
-  useEffect(() => {
-    if (form.province_id) {
-      getDistricts(form.province_id).then(res => setDistricts(res.data));
-    } else {
-      setDistricts([]);
-      setForm(f => ({ ...f, district_id: '', ward_id: '' }));
-    }
-  }, [form.province_id]);
+  // Khi province_id thay đổi, load districts
+useEffect(() => {
+  if (form.province_id) {
+    getDistricts(form.province_id).then(res => {
+      setDistricts(res.data);
+      // Nếu district_id hiện tại không có trong danh sách mới, reset
+      if (form.district_id && !res.data.some(d => d._id === form.district_id)) {
+        setForm(f => ({ ...f, district_id: '', ward_id: '' }));
+      }
+    });
+  } else {
+    setDistricts([]);
+    setForm(f => ({ ...f, district_id: '', ward_id: '' }));
+  }
+}, [form.province_id]);
 
-  // Fetch wards khi district_id thay đổi
-  useEffect(() => {
-    if (form.district_id) {
-      getWards(form.district_id).then(res => setWards(res.data));
-    } else {
-      setWards([]);
-      setForm(f => ({ ...f, ward_id: '' }));
-    }
-  }, [form.district_id]);
+// Khi district_id thay đổi, load wards
+useEffect(() => {
+  if (form.district_id) {
+    getWards(form.district_id).then(res => {
+      setWards(res.data);
+      // Nếu ward_id hiện tại không có trong danh sách mới, reset
+      if (form.ward_id && !res.data.some(w => w._id === form.ward_id)) {
+        setForm(f => ({ ...f, ward_id: '' }));
+      }
+    });
+  } else {
+    setWards([]);
+    setForm(f => ({ ...f, ward_id: '' }));
+  }
+}, [form.district_id]);
 
-  // Fill form nếu defaultAddress thay đổi
+
+  // Khi nhận defaultAddress (edit) hoặc reset (thêm mới)
   useEffect(() => {
     if (defaultAddress) {
       setForm({
@@ -59,22 +75,84 @@ const AddressForm = ({ defaultAddress, onChange }) => {
         province_id: defaultAddress.address?.province_id || '',
         district_id: defaultAddress.address?.district_id || '',
         ward_id: defaultAddress.address?.ward_id || '',
-        is_default: defaultAddress.is_default || false,
+        is_default: false,
+        _id: defaultAddress._id || ''
       });
+    } else {
+      setForm({
+        full_name: '',
+        email: '',
+        phone: '',
+        detail: '',
+        province_id: '',
+        district_id: '',
+        ward_id: '',
+        is_default: false,
+        _id: ''
+      });
+      setDistricts([]);
+      setWards([]);
     }
   }, [defaultAddress]);
 
   // Callback onChange
   useEffect(() => {
-    if (onChange) onChange(form);
+    if (onChange) {
+      const formattedData = {
+        full_name: form.full_name,
+        email: form.email,
+        phone: form.phone,
+        detail: form.detail,
+        province_id: form.province_id,
+        district_id: form.district_id,
+        ward_id: form.ward_id,
+        is_default: form.is_default
+      };
+      onChange(formattedData);
+    }
   }, [form, onChange]);
 
   const handleChange = (field, value) => {
     setForm(f => ({ ...f, [field]: value }));
   };
 
+  // Chọn nhanh địa chỉ đã lưu (chỉ hiển thị ở /checkout)
+  const handleSelectAddress = (id) => {
+    const selected = addressList?.find(addr => addr._id === id);
+    if (selected) {
+      setForm({
+        full_name: selected.full_name || '',
+        email: selected.email || '',
+        phone: selected.phone || '',
+        detail: selected.address?.detail || '',
+        province_id: selected.address?.province_id || '',
+        district_id: selected.address?.district_id || '',
+        ward_id: selected.address?.ward_id || '',
+        is_default: selected.is_default || false,
+        _id: selected._id || ''
+      });
+    }
+  };
+
   return (
     <div className="space-y-4">
+      {/* Chỉ hiển thị select sổ địa chỉ khi ở trang checkout và có addressList */}
+      {location.pathname === '/checkout' && addressList && addressList.length > 0 && (
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Sổ địa chỉ</InputLabel>
+          <Select
+            value={form._id || ''}
+            onChange={e => handleSelectAddress(e.target.value)}
+            label="Sổ địa chỉ"
+          >
+            {addressList.map(addr => (
+              <MenuItem key={addr._id} value={addr._id}>
+                {addr.full_name}, {addr.address.detail}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
       <TextField
         fullWidth
         label="Họ và tên"

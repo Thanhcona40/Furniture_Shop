@@ -22,6 +22,7 @@ const pageNameMap = {
   categories: "Quản lý Danh mục",
   orders: "Quản lý Đơn hàng",
   account: "Tài khoản",
+  orders_user : "Đơn hàng",
 };
 
 function getBreadcrumbs(pathname) {

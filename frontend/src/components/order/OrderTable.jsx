@@ -42,7 +42,7 @@ const OrderTable = ({ orders, addressCache, onShowDetail, onCancelOrder, getStat
           <TableBody>
             {orders.map((order) => (
               <TableRow key={order._id} sx={{ '&:hover': { backgroundColor: '#f9fafb' } }}>
-                <TableCell sx={{ fontWeight: 'medium', textAlign: 'center', border: '1px solid #d1d5db', padding: '8px 16px' }}>
+                <TableCell sx={{ fontWeight: 'medium', textAlign: 'center', border: '1px solid #d1d5db', padding: '8px 16px', color: 'blue' }}>
                   #{order.order_code}
                 </TableCell>
                 <TableCell sx={{ textAlign: 'center', border: '1px solid #d1d5db', padding: '8px 16px' }}>

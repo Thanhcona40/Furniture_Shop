@@ -1,6 +1,8 @@
-import { Controller, Get, Param, Request, UseGuards, } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Request, UseGuards, } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { AuthGuard } from '@nestjs/passport';
+import { CreateAddressDto } from './dto/create-address.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
 
 @Controller('address')
 export class AddressController {
@@ -41,5 +43,40 @@ export class AddressController {
   async getDefaultAddress(@Request() req) {
     const userId = req.user.user_id;
     return this.addressService.getDefaultAddress(userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('user')
+  async getUserAddresses(@Request() req) {
+    const userId = req.user.user_id;
+    return this.addressService.getUserAddresses(userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post()
+  async createAddress(@Request() req, @Body() createAddressDto: CreateAddressDto) {
+    const userId = req.user.user_id;
+    return this.addressService.createAddress(userId, createAddressDto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Put(':id')
+  async updateAddress(@Request() req, @Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
+    const userId = req.user.user_id;
+    return this.addressService.updateAddress(userId, id, updateAddressDto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':id')
+  async deleteAddress(@Request() req, @Param('id') id: string) {
+    const userId = req.user.user_id;
+    return this.addressService.deleteAddress(userId, id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Put(':id/set-default')
+  async setDefaultAddress(@Request() req, @Param('id') id: string) {
+    const userId = req.user.user_id;
+    return this.addressService.setDefaultAddress(userId, id);
   }
 }
