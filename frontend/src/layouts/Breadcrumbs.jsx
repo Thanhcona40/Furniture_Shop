@@ -15,12 +15,6 @@ const pageNameMap = {
   allproducts: "Tất cả sản phẩm",
   login: "Đăng nhập tài khoản",
   register: "Đăng kí tài khoản",
-  admin: "Quản trị",
-  dashboard: "Dashboard",
-  users: "Người dùng",
-  products: "Quản lý Sản phẩm",
-  categories: "Quản lý Danh mục",
-  orders: "Quản lý Đơn hàng",
   account: "Tài khoản",
   orders_user : "Đơn hàng",
 };
@@ -37,18 +31,32 @@ function getBreadcrumbs(pathname) {
     if (!name && idx > 0 && pathParts[idx - 1] === 'product') {
       name = 'Chi tiết sản phẩm';
     }
-    // Xử lý các route động khác nếu cần
-    if (!name && idx > 0 && pathParts[idx - 1] === 'admin') {
-      name = pageNameMap[part] || part;
-    }
     if (!name) name = part;
     breadcrumbs.push({ name, path: accumulatedPath });
   });
   return breadcrumbs;
 }
 
-const Breadcrumbs = ({ location }) => {
-  const breadcrumbs = getBreadcrumbs(location);
+const Breadcrumbs = () => {
+  const location = useLocation();
+  const breadcrumbs = getBreadcrumbs(location.pathname);
+
+  // Lấy category từ query string nếu có
+  const params = new URLSearchParams(location.search);
+  const category = params.get('category');
+
+  // Nếu đang ở allproducts và có category, thêm breadcrumb cho category
+  let displayBreadcrumbs = [...breadcrumbs];
+  if (
+    breadcrumbs.length > 0 &&
+    breadcrumbs[breadcrumbs.length - 1].path === '/allproducts' &&
+    category
+  ) {
+    displayBreadcrumbs.push({
+      name: category,
+      path: `${breadcrumbs[breadcrumbs.length - 1].path}?category=${encodeURIComponent(category)}`
+    });
+  }
 
   return (
     <div className="relative h-[200px]">
@@ -60,14 +68,14 @@ const Breadcrumbs = ({ location }) => {
       <div className="absolute inset-0 bg-black/30 z-10" />
       <div className="relative z-20 flex flex-col items-center justify-center h-full text-white text-center px-4">
         <h1 className="text-4xl mb-2">
-          {breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].name : ''}
+          {displayBreadcrumbs.length > 0 ? displayBreadcrumbs[displayBreadcrumbs.length - 1].name : ''}
         </h1>
         <p className="text-sm sm:text-base flex items-center justify-center">
           <Link to="/">Trang chủ</Link>
-          {breadcrumbs.map((bc, idx) => (
+          {displayBreadcrumbs.map((bc, idx) => (
             <React.Fragment key={bc.path}>
               <KeyboardArrowRightOutlinedIcon />
-              {idx < breadcrumbs.length - 1 ? (
+              {idx < displayBreadcrumbs.length - 1 ? (
                 <Link to={bc.path} className="hover:text-primary">
                   {bc.name}
                 </Link>

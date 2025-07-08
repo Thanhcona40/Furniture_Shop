@@ -155,17 +155,19 @@ useEffect(() => {
       )}
       <TextField
         fullWidth
-        label="Họ và tên"
-        value={form.full_name}
-        onChange={e => handleChange('full_name', e.target.value)}
-        margin="normal"
-      />
-      <TextField
-        fullWidth
         label="Email"
         type="email"
         value={form.email}
         onChange={e => handleChange('email', e.target.value)}
+        margin="normal"
+        disabled
+        className='bg-gray-300'
+      />
+      <TextField
+        fullWidth
+        label="Họ và tên"
+        value={form.full_name}
+        onChange={e => handleChange('full_name', e.target.value)}
         margin="normal"
       />
       <TextField

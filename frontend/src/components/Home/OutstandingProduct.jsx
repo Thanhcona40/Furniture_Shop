@@ -2,14 +2,23 @@ import React from 'react';
 import ProductCard from '../product/ProductCard';
 import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import KeyboardArrowLeftOutlinedIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
-import KeyboardArrowRightOutlinedIcon from '@mui/icons-material/KeyboardArrowRightOutlined';
 import { Link, useNavigate } from 'react-router-dom';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
 
+const categories = [
+    { label: 'Sofa', value: 'sofa' },
+    { label: 'Ghế', value: 'ghe' },
+    { label: 'Trang trí', value: 'trang-tri' },
+    { label: 'Kệ sách', value: 'ke-sach' },
+    { label: 'Bàn', value: 'ban' },
+];
 
 const OutstandingProduct = ({products}) => {
     const productInitial = products?.[0] || null;
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     return (
         <div className='max-w-[1110px] max-h-[600px]  mx-auto mb-5 px-4 flex flex-col lg:flex-row gap-10'>
             <div className='lg:w-1/3 w-full border border-primary p-4 inline-block'>
@@ -47,23 +56,43 @@ const OutstandingProduct = ({products}) => {
                     </h3>
 
                     <div className='flex text-sm font-medium space-x-3 items-center'>
-                        <Link className='hover:text-primary'>Sofa</Link>
-                        <Link className='hover:text-primary'>Ghế</Link>
-                        <Link className='hover:text-primary'>Trang trí</Link>
-                        <Link className='hover:text-primary'>Kệ sách</Link>
-                        <Link className='hover:text-primary'>Bàn</Link>
-                        <Link className='hover:text-primary'>Xem tất cả</Link>
-                        <div>
-                            <KeyboardArrowLeftOutlinedIcon className='cursor-pointer' />
-                            <KeyboardArrowRightOutlinedIcon className='cursor-pointer' />
-                        </div>
+                        {categories.map(cat => (
+                            <button
+                                key={cat.value}
+                                className='hover:text-primary focus:outline-none'
+                                onClick={() => navigate(`/allproducts?category=${encodeURIComponent(cat.label)}`)}
+                            >
+                                {cat.label}
+                            </button>
+                        ))}
+                        <button
+                            className='hover:text-primary focus:outline-none'
+                            onClick={() => navigate('/allproducts')}
+                        >
+                            Xem tất cả
+                        </button>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {products?.slice(1).map((item) => (
-                        <ProductCard key={item.id} product={item} />
-                    ))}
-                </div>
+                <Swiper
+                  spaceBetween={16}
+                  slidesPerView={4}
+                  autoplay={{ delay: 2000, disableOnInteraction: false }}
+                  modules={[Autoplay]}
+                  loop={true}
+                  observer={true}
+                  observeParents={true}
+                  breakpoints={{
+                    320: { slidesPerView: 1 },
+                    640: { slidesPerView: 2 },
+                    1024: { slidesPerView: 4 }
+                  }}
+                >
+                  {products?.slice(1).map((item) => (
+                    <SwiperSlide key={item._id || item.id}>
+                      <ProductCard product={item} />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
             </div>
         </div>
     );

@@ -1,13 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ProductCard from '../product/ProductCard';
 import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import KeyboardArrowLeftOutlinedIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
-import KeyboardArrowRightOutlinedIcon from '@mui/icons-material/KeyboardArrowRightOutlined';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+
+const categories = [
+    { label: 'Sofa', value: 'sofa' },
+    { label: 'Ghế', value: 'ghe' },
+    { label: 'Trang trí', value: 'trang-tri' },
+    { label: 'Kệ sách', value: 'ke-sach' },
+    { label: 'Bàn', value: 'ban' },
+];
 
 const HotProduct = ({products}) => {
-   const productInitial = products?.[0] || null;
+    const [selectedCategory, setSelectedCategory] = useState('all');
+    const navigate = useNavigate();
+
+    // Giả sử mỗi product có trường category (nếu chưa có, cần bổ sung ở backend)
+    const filteredProducts = selectedCategory === 'all'
+        ? products?.slice(1) || []
+        : (products?.slice(1).filter(p => p.category === selectedCategory) || []);
+
+    const productInitial = products?.[0] || null;
+
     return (
         <div className='max-w-[1110px] max-h-[600px]  mx-auto mb-5 px-4 flex flex-col lg:flex-row gap-10'>
             <div className='lg:w-2/3 w-full'>
@@ -18,23 +37,43 @@ const HotProduct = ({products}) => {
                     </h3>
 
                     <div className='flex text-sm font-medium space-x-3 items-center'>
-                        <Link className='hover:text-primary'>Sofa</Link>
-                        <Link className='hover:text-primary'>Ghế</Link>
-                        <Link className='hover:text-primary'>Trang trí</Link>
-                        <Link className='hover:text-primary'>Kệ sách</Link>
-                        <Link className='hover:text-primary'>Bàn</Link>
-                        <Link className='hover:text-primary'>Xem tất cả</Link>
-                        <div>
-                            <KeyboardArrowLeftOutlinedIcon className='cursor-pointer' />
-                            <KeyboardArrowRightOutlinedIcon className='cursor-pointer' />
-                        </div>
+                        {categories.map(cat => (
+                            <button
+                                key={cat.value}
+                                className={`hover:text-primary focus:outline-none ${selectedCategory === cat.value ? 'text-primary' : ''}`}
+                                onClick={() => navigate(`/allproducts?category=${encodeURIComponent(cat.label)}`)}
+                            >
+                                {cat.label}
+                            </button>
+                        ))}
+                        <button
+                            className={`hover:text-primary focus:outline-none ${selectedCategory === 'all' ? 'text-primary' : ''}`}
+                            onClick={() => navigate('/allproducts')}
+                        >
+                            Xem tất cả
+                        </button>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {products?.slice(1).map((item) => (
-                        <ProductCard key={item.id} product={item} />
-                    ))}
-                </div>
+                <Swiper
+                  spaceBetween={16}
+                  slidesPerView={4}
+                  autoplay={{ delay: 2000, disableOnInteraction: false }}
+                  modules={[Autoplay]}
+                  loop={true}
+                  observer={true}
+                  observeParents={true}
+                  breakpoints={{
+                    320: { slidesPerView: 1 },
+                    640: { slidesPerView: 2 },
+                    1024: { slidesPerView: 4 }
+                  }}
+                >
+                  {filteredProducts.map((item) => (
+                    <SwiperSlide key={item.id}>
+                      <ProductCard product={item} />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
             </div>
             <div className='lg:w-1/3 w-full border border-primary p-4 inline-block'>
                 <div className="group relative selection:overflow-hidden transition-all">
