@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { searchProducts } from '../api/product';
 import ProductCard from '../components/product/ProductCard';
-import MainLayout from '../layouts/MainLayout';
 
 const SearchPage = () => {
     const [searchParams] = useSearchParams();

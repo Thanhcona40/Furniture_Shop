@@ -1,8 +1,6 @@
-import logo from './logo.svg';
 import './App.css';
-import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MainLayout from './layouts/MainLayout';
@@ -15,7 +13,7 @@ import ProfilePageLayout from './components/profile/ProfilePageLayout';
 import Contact from './pages/Contact';
 import Checkout from './pages/Checkout';
 import AdminLayout from './components/admin/AdminLayout';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Dashboard from './components/admin/dashboard/Dashboard';
 import UserManagement from './components/admin/user/UserManagement';
@@ -30,6 +28,7 @@ import PublicRoute from "./routes/PublicRoute";
 import Profile from './pages/AccountPage/Profile';
 import Order from './pages/AccountPage/Order';
 import AddressPage from './pages/AccountPage/AddressPage';
+import { WebSocketProvider } from './contexts/WebSocketContext';
 
 function App() {
   const location = useLocation();
@@ -39,7 +38,7 @@ function App() {
   }, [location.pathname]);
 
   return (
-    <>
+    <WebSocketProvider>
       <Routes>
         <Route path="/admin" element={
           <AdminRoute>
@@ -72,7 +71,7 @@ function App() {
         <Route path='/checkout' element={<PrivateRoute><Checkout /></PrivateRoute>} />
       </Routes>
       <ToastContainer position="top-center" autoClose={3000} />
-    </>
+    </WebSocketProvider>
   );
 }
 

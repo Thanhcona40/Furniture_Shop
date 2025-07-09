@@ -8,6 +8,7 @@ import { OrderItem, OrderItemSchema } from './schemas/order-item.schema';
 import { UserAddress, UserAddressSchema } from '../address/schemas/user-address.schema';
 import { AuthModule } from '../auth/auth.module';
 import { ProductModule } from '../product/product.module';
+import { WebsocketModule } from '../websocket/websocket.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ProductModule } from '../product/product.module';
     ]),
     AuthModule,
     ProductModule,
+    WebsocketModule,
   ],
   controllers: [OrderController],
   providers: [OrderService],

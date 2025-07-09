@@ -13,6 +13,7 @@ import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutl
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { searchProducts } from '../api/product';
+import NotificationBell from '../components/NotificationBell';
 
 const Header = ({ isTransparent }) => {
     const categories = ["Sofa", "Ghế", "Trang trí", "Kệ sách", "Bàn", "Tủ quần áo"];
@@ -185,6 +186,7 @@ const Header = ({ isTransparent }) => {
                     <div className={`whitespace-nowrap space-x-4 text-xs`}>
                         {user ? (
                             <div className='flex space-x-3 items-center'>
+                                <NotificationBell />
                                 <div className='flex items-center relative'>
                                     <Link
                                         to="/account" className="hover:text-primary font-medium"
@@ -198,7 +200,7 @@ const Header = ({ isTransparent }) => {
                                             <Link to="/account" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
                                                 Thông tin tài khoản
                                             </Link>
-                                            <Link to="/account/orders-user" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                            <Link to="/account/orders_user" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
                                                 Đơn hàng của bạn
                                             </Link>
                                             <Link to="/account/address" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">

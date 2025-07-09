@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Divider, Radio, Space, message, Modal } from 'antd';
+import { Button, Divider, Radio, Space, message } from 'antd';
 import { ArrowLeftOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import AddressForm from '../components/profile/AddressForm';

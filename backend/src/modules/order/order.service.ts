@@ -9,6 +9,7 @@ import { UserAddress, UserAddressDocument } from '../address/schemas/user-addres
 import { OrderStatus } from 'src/common/enums/order-status.enum';
 import { ProductService } from '../product/product.service';
 import { Role } from 'src/common/enums/role.enum';
+import { WebsocketService } from '../websocket/websocket.service';
 
 @Injectable()
 export class OrderService {
@@ -18,6 +19,7 @@ export class OrderService {
     @InjectModel(OrderTrack.name) private orderTrackModel: Model<OrderTrackDocument>,
     @InjectModel(UserAddress.name) private userAddressModel: Model<UserAddressDocument>,
     private productService: ProductService,
+    private websocketService: WebsocketService,
   ) {}
 
   async createOrder(createOrderDto: CreateOrderDto, userId: string) {
@@ -103,7 +105,7 @@ export class OrderService {
     await orderTrack.save();
 
     // Populate để trả về dữ liệu đầy đủ
-    return await this.orderModel.findById(savedOrder._id)
+    const populatedOrder = await this.orderModel.findById(savedOrder._id)
       .populate({
         path: 'items',
         populate: [
@@ -115,6 +117,11 @@ export class OrderService {
         ]
       })
       .populate('user_id', 'full_name email phone');
+
+    // Gửi thông báo đơn hàng mới cho admin
+    await this.websocketService.notifyAdminNewOrder(populatedOrder);
+
+    return populatedOrder;
   }
 
   // Hàm tạo mã đơn hàng tự động
@@ -228,6 +235,7 @@ export class OrderService {
       throw new NotFoundException('Đơn hàng không tồn tại');
     }
 
+    const oldStatus = order.status;
     order.status = OrderStatus[status.toUpperCase()];
     await order.save();
 
@@ -238,6 +246,15 @@ export class OrderService {
       description: `Đơn hàng đã được cập nhật trạng thái: ${status}`
     });
     await orderTrack.save();
+
+    // Gửi thông báo realtime cho user
+    await this.websocketService.notifyUserOrderStatusUpdate(
+      order.user_id.toString(),
+      order._id.toString(),
+      order.order_code,
+      oldStatus,
+      status
+    );
 
     return order;
   }

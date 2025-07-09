@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { getDashboardSummary, getDashboardChartData } from '../../../api/dashboard';
-import { LineChart } from '@mui/x-charts/LineChart';
 import RecentOrdersTable from './RecentOrdersTable';
 import BestSellingProductsTable from './BestSellingProductsTable';
 import StatCard from './StatCard';
