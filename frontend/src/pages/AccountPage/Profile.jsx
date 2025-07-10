@@ -14,7 +14,6 @@ const Profile = () => {
     });
 
     useEffect(() => {
-        // Fetch user profile with addresses when component mounts
         dispatch(fetchUserProfile());
     }, [dispatch]);
 

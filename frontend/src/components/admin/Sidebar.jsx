@@ -5,6 +5,7 @@ import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import BedOutlinedIcon from '@mui/icons-material/BedOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import BusinessCenterOutlinedIcon from '@mui/icons-material/BusinessCenterOutlined';
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { useDispatch } from 'react-redux';
@@ -26,6 +27,7 @@ const Sidebar = () => {
     { path: "users", label: "Quản lý Người dùng", icon: <GroupOutlinedIcon /> },
     { path: "products", label: "Quản lý Sản phẩm", icon: <BedOutlinedIcon /> },
     { path: "categories", label: "Quản lý Danh mục", icon: <CategoryOutlinedIcon /> },
+    { path: "blogs", label: "Quản lý Bài viết", icon: <ArticleOutlinedIcon /> },
     { path: "orders", label: "Quản lý Đơn hàng", icon: <BusinessCenterOutlinedIcon /> },
   ];
   return (

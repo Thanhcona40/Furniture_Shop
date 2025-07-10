@@ -1,13 +1,14 @@
 import './App.css';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import React, { useEffect } from 'react';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
 import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage';
 import About from './pages/About';
 import SearchPage from './pages/SearchPage';
-import Blog from './pages/Blog';
+import Blog from './pages/Blog/Blog';
+import BlogDetail from './pages/Blog/BlogDetail';
 import Cart from './pages/Cart';
 import ProfilePageLayout from './components/profile/ProfilePageLayout';
 import Contact from './pages/Contact';
@@ -20,6 +21,7 @@ import UserManagement from './components/admin/user/UserManagement';
 import OrderManagement from './components/admin/order/OrderManagement';
 import ProductManagement from './components/admin/product/ProductManagement';
 import CategoryManagement from './components/admin/category/CategoryManagement';
+import BlogManagement from './components/admin/blog/BlogManagement';
 import ProductListPage from './pages/ProductPage/ProductListPage';
 import ProductDetail from './pages/ProductPage/ProductDetail';
 import PrivateRoute from "./routes/PrivateRoute";
@@ -49,12 +51,14 @@ function App() {
           <Route path="users" element={<UserManagement />} />
           <Route path="products" element={<ProductManagement />} />
           <Route path="categories" element={<CategoryManagement />} />
+          <Route path="blogs" element={<BlogManagement />} />
           <Route path="orders" element={<OrderManagement />} />
         </Route>
         <Route path='/' element={<MainLayout />}>
           <Route path='' element={<HomePage />} />
           <Route path='about' element={<About />} />
           <Route path='blog' element={<Blog />} />
+          <Route path='blog/:id' element={<BlogDetail />} />
           <Route path='cart' element={<PrivateRoute><Cart /></PrivateRoute>} />
           <Route path='account' element={<PrivateRoute><ProfilePageLayout /></PrivateRoute>}>
             <Route index element={<Profile />} />

@@ -3,7 +3,7 @@ import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
 import { GoogleOutlined } from '@ant-design/icons';
 import * as Yup from 'yup';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
-import { registerApi } from '../api/auth';
+import { registerApi } from '../../api/auth';
 import { toast } from 'react-toastify';
 
 const validateSchema = Yup.object().shape({

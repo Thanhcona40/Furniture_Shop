@@ -16,6 +16,7 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { WebsocketModule } from './modules/websocket/websocket.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { BlogModule } from './modules/blog/blog.module';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { NotificationModule } from './modules/notification/notification.module';
     PaymentModule,
     DashboardModule,
     WebsocketModule,
-    NotificationModule
+    NotificationModule,
+    BlogModule
   ],
   controllers: [AppController, PaymentController],
   providers: [

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useWebSocket } from '../contexts/WebSocketContext';
+import { useWebSocket } from '../../contexts/WebSocketContext';
 import { useNavigate } from 'react-router-dom';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import { useSelector } from 'react-redux';

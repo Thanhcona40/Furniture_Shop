@@ -9,7 +9,7 @@ import {
   getDistrictNameById,
   getWardNameById
 } from '../../api/address';
-import AddressForm from '../../components/profile/AddressForm';
+import AddressForm from '../../components/checkout/AddressForm';
 import { 
   Dialog, 
   DialogTitle, 
@@ -60,7 +60,6 @@ const AddressPage = () => {
         setAddressNames({});
       }
     } catch (error) {
-      console.error('Error loading addresses:', error);
       showSnackbar('Có lỗi xảy ra khi tải danh sách địa chỉ', 'error');
     } finally {
       setLoading(false);
@@ -100,7 +99,6 @@ const AddressPage = () => {
         showSnackbar('Xóa địa chỉ thành công');
         loadAddresses();
       } catch (error) {
-        console.error('Error deleting address:', error);
         showSnackbar('Có lỗi xảy ra khi xóa địa chỉ', 'error');
       }
     }
