@@ -10,7 +10,7 @@ import SearchPage from './pages/SearchPage';
 import Blog from './pages/Blog/Blog';
 import BlogDetail from './pages/Blog/BlogDetail';
 import Cart from './pages/Cart';
-import ProfilePageLayout from './components/profile/ProfilePageLayout';
+import ProfilePageLayout from './layouts/ProfilePageLayout';
 import Contact from './pages/Contact';
 import Checkout from './pages/Checkout';
 import AdminLayout from './components/admin/AdminLayout';
@@ -30,6 +30,7 @@ import PublicRoute from "./routes/PublicRoute";
 import Profile from './pages/AccountPage/Profile';
 import Order from './pages/AccountPage/Order';
 import AddressPage from './pages/AccountPage/AddressPage';
+import ChangePassword from './pages/AccountPage/ChangePassword';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 
 function App() {
@@ -64,6 +65,7 @@ function App() {
             <Route index element={<Profile />} />
             <Route path='address' element={<AddressPage />} />
             <Route path='orders_user' element={<Order />} />
+            <Route path='change_password' element={<ChangePassword />} />
           </Route>
           <Route path='search' element={<SearchPage />} />
           <Route path='contact' element={<Contact />} />

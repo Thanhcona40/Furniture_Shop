@@ -5,6 +5,7 @@ const menuItems = [
   { label: 'Thông tin tài khoản', path: '' },
   { label: 'Đơn hàng của bạn', path: 'orders_user' },
   { label: 'Sổ địa chỉ', path: 'address' },
+  { label: 'Đổi mật khẩu', path: 'change_password' },
 ];
 
 const ProfilePageLayout = () => {

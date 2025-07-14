@@ -17,6 +17,7 @@ const pageNameMap = {
   register: "Đăng kí tài khoản",
   account: "Tài khoản",
   orders_user : "Đơn hàng",
+  change_password: "Đổi mật khẩu",
 };
 
 function getBreadcrumbs(pathname) {

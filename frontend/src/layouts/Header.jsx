@@ -13,7 +13,7 @@ import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutl
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { searchProducts } from '../api/product';
-import NotificationBell from '../components/NotificationBell';
+import NotificationBell from '../components/notification/NotificationBell';
 
 const Header = ({ isTransparent }) => {
     const categories = ["Sofa", "Ghế", "Trang trí", "Kệ sách", "Bàn", "Tủ quần áo"];
@@ -205,6 +205,9 @@ const Header = ({ isTransparent }) => {
                                             </Link>
                                             <Link to="/account/address" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
                                                 Địa chỉ của bạn
+                                            </Link>
+                                            <Link to="/account/change_password" className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">
+                                                Đổi mật khẩu
                                             </Link>
                                         </div>
                                         ) : (  '' )

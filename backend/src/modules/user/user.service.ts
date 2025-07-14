@@ -7,6 +7,9 @@ import { UserAddress, UserAddressDocument } from '../address/schemas/user-addres
 import { Province } from '../address/schemas/province.schema';
 import { District } from '../address/schemas/district.schema';
 import { Ward } from '../address/schemas/ward.schema';
+import * as bcrypt from 'bcrypt';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { BadRequestException } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
@@ -76,5 +79,25 @@ export class UserService {
 
     async deleteUser(userId: string) {
         return this.userModel.findByIdAndDelete(userId);
+    }
+
+    async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
+        const { oldPassword, newPassword, confirmNewPassword } = changePasswordDto;
+        if (newPassword !== confirmNewPassword) {
+            throw new BadRequestException('Mật khẩu xác nhận không khớp');
+        }
+        const user = await this.userModel.findById(userId);
+        if (!user) {
+            throw new BadRequestException('Người dùng không tồn tại');
+        }
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            throw new BadRequestException('Mật khẩu cũ không đúng');
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        user.password = hashedPassword;
+        await user.save();
+        return { message: 'Đổi mật khẩu thành công' };
     }
 }

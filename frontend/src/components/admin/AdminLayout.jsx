@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import NotificationBell from '../NotificationBell';
+import NotificationBell from '../notification/NotificationBell';
 
 const AdminLayout = () => {
     return (

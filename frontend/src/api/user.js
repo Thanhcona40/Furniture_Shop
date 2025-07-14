@@ -19,3 +19,8 @@ export const getDashboardSummary = async () => {
   const res = await api.get('/admin/dashboard/summary');
   return res.data;
 }; 
+
+export const changePassword = async (data) => {
+  const res = await api.patch('/user/change-password', data);
+  return res.data;
+}; 

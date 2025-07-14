@@ -28,12 +28,16 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response && error.response.status === 401) {
+        if (
+            error.response && 
+            error.response.status === 401 &&
+            (localStorage.getItem("token") || localStorage.getItem("user"))
+        ) {
             toast.error("Phiên đăng nhập của bạn đã hết hạn, Vui lòng đăng nhập lại để tiếp tục mua sắm");
             setTimeout(() => {
                 localStorage.removeItem("token");
                 localStorage.removeItem("user");
-                window.location.href = "/";
+                window.location.href = "/login";
             }, 5000);
         }
         return Promise.reject(error);

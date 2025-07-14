@@ -5,9 +5,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { loginApi } from '../api/auth';
+import { loginApi } from '../../api/auth';
 import { toast } from 'react-toastify';
-import { loginSuccess } from '../redux/slices/authSlice';
+import { loginSuccess } from '../../redux/slices/authSlice';
 
 const validateSchema = Yup.object().shape({
   email: Yup.string()
