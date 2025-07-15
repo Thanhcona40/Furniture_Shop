@@ -49,30 +49,61 @@ export class DashboardService {
     };
   }
 
-  async getChartData(): Promise<Array<{date: string, revenue: number, orders: number}>> {
-    // Lấy tất cả đơn hàng trong tháng hiện tại
-    const orders = await this.orderService.getAllOrders();
+  async getChartData(month?: string, year?: string): Promise<Array<{date: string, revenue: number, orders: number}>> {
+    // Nếu không có year thì lấy năm hiện tại
     const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    // Khởi tạo mảng dữ liệu cho từng ngày
-    const chartData: Array<{date: string, revenue: number, orders: number}> = [];
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-      chartData.push({ date: dateStr, revenue: 0, orders: 0 });
-    }
-    // Tổng hợp dữ liệu
-    orders.forEach((order: any) => {
-      if (!order.createdAt) return;
-      const d = new Date(order.createdAt);
-      if (d.getFullYear() === year && d.getMonth() === month) {
-        const day = d.getDate();
-        const idx = day - 1;
-        chartData[idx].revenue += order.total || 0;
-        chartData[idx].orders += 1;
+    const y = year ? parseInt(year) : now.getFullYear();
+    // Nếu có month thì trả về dữ liệu từng ngày trong tháng đó
+    if (month) {
+      const m = parseInt(month) - 1; // JS month 0-based
+      const daysInMonth = new Date(y, m + 1, 0).getDate();
+      const chartData: Array<{date: string, revenue: number, orders: number}> = [];
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${y}-${(m + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        chartData.push({ date: dateStr, revenue: 0, orders: 0 });
       }
-    });
-    return chartData;
+      const orders = await this.orderService.getAllOrders();
+      orders.forEach((order: any) => {
+        if (!order.createdAt) return;
+        const d = new Date(order.createdAt);
+        if (d.getFullYear() === y && d.getMonth() === m) {
+          const day = d.getDate();
+          const idx = day - 1;
+          chartData[idx].revenue += order.total || 0;
+          chartData[idx].orders += 1;
+        }
+      });
+      return chartData;
+    } else {
+      // Nếu không có month, trả về dữ liệu từng ngày của cả năm (hoặc từng tháng nếu muốn)
+      // Ở đây trả về từng ngày của cả năm (có thể sửa thành từng tháng nếu muốn)
+      const chartData: Array<{date: string, revenue: number, orders: number}> = [];
+      for (let m = 0; m < 12; m++) {
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+        for (let day = 1; day <= daysInMonth; day++) {
+          const dateStr = `${y}-${(m + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+          chartData.push({ date: dateStr, revenue: 0, orders: 0 });
+        }
+      }
+      const orders = await this.orderService.getAllOrders();
+      orders.forEach((order: any) => {
+        if (!order.createdAt) return;
+        const d = new Date(order.createdAt);
+        if (d.getFullYear() === y) {
+          const m = d.getMonth();
+          const day = d.getDate();
+          // Tìm index
+          const idx = chartData.findIndex(item => {
+            const [yy, mm, dd] = item.date.split('-');
+            return parseInt(yy) === y && parseInt(mm) === m + 1 && parseInt(dd) === day;
+          });
+          if (idx !== -1) {
+            chartData[idx].revenue += order.total || 0;
+            chartData[idx].orders += 1;
+          }
+        }
+      });
+      return chartData;
+    }
   }
 } 

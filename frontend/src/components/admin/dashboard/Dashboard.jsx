@@ -8,8 +8,6 @@ import DashboardChart from './DashboardChart';
 const Dashboard = () => {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [chartData, setChartData] = useState([]);
-  const [chartLoading, setChartLoading] = useState(true);
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -23,20 +21,6 @@ const Dashboard = () => {
       }
     };
     fetchSummary();
-  }, []);
-
-  useEffect(() => {
-    const fetchChartData = async () => {
-      try {
-        const data = await getDashboardChartData();
-        setChartData(data);
-      } catch (error) {
-        setChartData([]);
-      } finally {
-        setChartLoading(false);
-      }
-    };
-    fetchChartData();
   }, []);
 
   if (loading) return <div className="p-6 ml-64">Đang tải dữ liệu...</div>;

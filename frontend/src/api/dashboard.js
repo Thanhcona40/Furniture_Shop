@@ -5,7 +5,7 @@ export const getDashboardSummary = async () => {
   return res.data;
 };
 
-export const getDashboardChartData = async () => {
-  const res = await api.get('/admin/dashboard/chart-data');
+export const getDashboardChartData = async (params) => {
+  const res = await api.get('/admin/dashboard/chart-data', { params });
   return res.data;
 }; 

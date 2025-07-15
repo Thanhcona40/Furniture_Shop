@@ -7,6 +7,7 @@ import { ORDER_STATUS_TABS } from '../../../utils/orderConstants';
 import AdminOrderTable from './AdminOrderTable';
 import OrderDetailModal from './OrderDetailModal';
 import ConfirmDialog from './ConfirmDialog';
+import OrderFilterBar from './OrderFilterBar';
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -20,6 +21,10 @@ const OrderManagement = () => {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [pendingStatus, setPendingStatus] = useState(null);
   const [status, setStatus] = useState('all');
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const [dateFilter, setDateFilter] = useState(null);
+  const [sortOrder, setSortOrder] = useState('desc'); // 'desc' hoặc 'asc'
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -88,9 +93,50 @@ const OrderManagement = () => {
     }
   };
 
+  // Lọc, tìm kiếm, sắp xếp orders
+  const filteredOrders = orders
+    .filter(order => {
+      // Tìm kiếm theo mã đơn hoặc tên khách hàng
+      const searchText = search.trim().toLowerCase();
+      if (!searchText) return true;
+      const codeMatch = order.order_code?.toLowerCase().includes(searchText);
+      const nameMatch = order.user_id?.full_name?.toLowerCase().includes(searchText);
+      return codeMatch || nameMatch;
+    })
+    .filter(order => {
+      // Lọc theo ngày (nếu có chọn ngày)
+      if (!dateFilter) return true;
+      const created = new Date(order.createdAt);
+      const selected = new Date(dateFilter);
+      // So sánh ngày/tháng/năm, bỏ qua giờ phút giây
+      return created.getFullYear() === selected.getFullYear() &&
+        created.getMonth() === selected.getMonth() &&
+        created.getDate() === selected.getDate();
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+    });
+
+  // Khi bấm nút hoặc Enter mới lọc
+  const handleSearch = (e) => {
+    if (e) e.preventDefault();
+    setSearch(searchInput);
+  };
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Quản lý Đơn hàng</h1>
+      <OrderFilterBar
+        searchInput={searchInput}
+        setSearchInput={setSearchInput}
+        handleSearch={handleSearch}
+        dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+      />
       
       <Tabs
         value={status}
@@ -105,7 +151,7 @@ const OrderManagement = () => {
       </Tabs>
       
       <AdminOrderTable 
-        orders={orders} 
+        orders={filteredOrders} 
         loading={loading} 
         onViewDetail={handleViewDetail} 
       />

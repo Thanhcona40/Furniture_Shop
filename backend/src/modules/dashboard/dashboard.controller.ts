@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { DashboardSummaryDto } from './dto/dashboard-summary.dto';
 
@@ -12,7 +12,7 @@ export class DashboardController {
   }
 
   @Get('chart-data')
-  async getChartData() {
-    return this.dashboardService.getChartData();
+  async getChartData(@Query('month') month?: string, @Query('year') year?: string) {
+    return this.dashboardService.getChartData(month, year);
   }
 } 
