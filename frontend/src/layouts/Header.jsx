@@ -108,9 +108,12 @@ const Header = ({ isTransparent }) => {
             <div className="relative z-10 w-9/12 mx-auto">
                 {/* TOP BAR */}
                 <div className={`flex items-center justify-between px-8 py-4 ${isTransparent ? 'bg-transparent' : 'bg-white'} gap-8`}>
-                    <Link to="/" className={`text-2xl font-bold whitespace-nowrap text-blue-700`}>
-                        shop furniture
+                    <Link to="/" className={`text-2xl font-bold whitespace-nowrap flex items-center`}>
+                        <span className="w-8 h-8 rounded-md bg-primary flex justify-center mr-2 text-white">🛋</span>
+                        <span className="text-gray-800">Nội Thất </span>
+                        <span className="text-primary"> Xinh</span>
                     </Link>
+                    
 
                     <div className="flex-1 flex justify-center">
                         <div className="relative w-full max-w-md">

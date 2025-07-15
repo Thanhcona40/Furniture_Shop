@@ -14,9 +14,16 @@ const BestSellingProductsTable = ({ products }) => (
         <tbody>
           {products.map((product, idx) => (
             <tr key={product._id || idx} className="border-t">
-              <td>{product.name}</td>
+              <td>
+                {product.productName}
+                {product.variantName && (
+                  <span style={{ fontSize: '12px', color: '#888', marginLeft: 4 }}>
+                    ({product.variantName})
+                  </span>
+                )}
+              </td>
               <td>{product.sold}</td>
-              <td>{product.stock_quantity}</td>
+              <td>{product.stock}</td>
             </tr>
           ))}
         </tbody>

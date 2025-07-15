@@ -1,6 +1,5 @@
 import React from 'react';
-import { statusColor, statusLabel } from '../../../utils/orderConstants';
-import { Chip } from '@mui/material';
+import { statusColor, statusLabel, statusBg } from '../../../utils/orderConstants';
 
 const RecentOrdersTable = ({ orders }) => (
     <div className="bg-white rounded shadow p-4">
@@ -21,10 +20,9 @@ const RecentOrdersTable = ({ orders }) => (
               <td>{order.user_id?.full_name || 'Ẩn danh'}</td>
               <td>{order.total?.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})}</td>
               <td>
-                <Chip
-                  label={statusLabel[order.status]}
-                  color={statusColor[order.status]}
-                />
+                <span className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${statusBg[statusColor[order.status]] || statusBg.default}`}>
+                  {statusLabel[order.status] || order.status}
+                </span>
               </td>
             </tr>
           ))}

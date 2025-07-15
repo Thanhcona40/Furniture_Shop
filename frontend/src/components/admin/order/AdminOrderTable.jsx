@@ -1,14 +1,6 @@
 import React from 'react';
-import { statusColor, statusLabel } from '../../../utils/orderConstants';
+import { statusColor, statusLabel, statusBg } from '../../../utils/orderConstants';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
-
-const statusBg = {
-  default: 'bg-gray-200 text-gray-800',
-  primary: 'bg-blue-600 text-white',
-  warning: 'bg-yellow-400 text-white',
-  success: 'bg-green-500 text-white',
-  error: 'bg-red-500 text-white',
-};
 
 const AdminOrderTable = ({ orders, loading, onViewDetail }) => {
   if (loading) {

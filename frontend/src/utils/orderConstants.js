@@ -14,6 +14,14 @@ export const statusLabel = {
   cancelled: 'Đã hủy'
 };
 
+export const statusBg = {
+  default: 'bg-gray-200 text-gray-800',
+  primary: 'bg-blue-600 text-white',
+  warning: 'bg-yellow-400 text-white',
+  success: 'bg-green-500 text-white',
+  error: 'bg-red-500 text-white',
+};
+
 export const nextStatus = {
   pending: 'confirmed',
   confirmed: 'shipping',

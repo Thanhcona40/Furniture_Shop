@@ -23,12 +23,12 @@ const Sidebar = () => {
   }
 
   const navItems = [
-    { path: "", label: "Dashboard", icon: <DashboardOutlinedIcon /> },
-    { path: "users", label: "Quản lý Người dùng", icon: <GroupOutlinedIcon /> },
-    { path: "products", label: "Quản lý Sản phẩm", icon: <BedOutlinedIcon /> },
-    { path: "categories", label: "Quản lý Danh mục", icon: <CategoryOutlinedIcon /> },
-    { path: "blogs", label: "Quản lý Bài viết", icon: <ArticleOutlinedIcon /> },
-    { path: "orders", label: "Quản lý Đơn hàng", icon: <BusinessCenterOutlinedIcon /> },
+    { path: "/admin", label: "Dashboard", icon: <DashboardOutlinedIcon /> },
+    { path: "/admin/users", label: "Quản lý Người dùng", icon: <GroupOutlinedIcon /> },
+    { path: "/admin/products", label: "Quản lý Sản phẩm", icon: <BedOutlinedIcon /> },
+    { path: "/admin/categories", label: "Quản lý Danh mục", icon: <CategoryOutlinedIcon /> },
+    { path: "/admin/blogs", label: "Quản lý Bài viết", icon: <ArticleOutlinedIcon /> },
+    { path: "/admin/orders", label: "Quản lý Đơn hàng", icon: <BusinessCenterOutlinedIcon /> },
   ];
   return (
     <aside className="w-64 h-screen bg-white text-gray-800 fixed shadow-md border-r border-gray-200">
@@ -48,12 +48,12 @@ const Sidebar = () => {
             <li key={item.path}>
               <Link
                 to={item.path}
-                className={`flex items-center p-3 rounded-lg transition-all text-sm font-medium ${location.pathname.includes(item.path)
+                className={`flex items-center p-3 rounded-lg transition-all text-sm font-medium ${location.pathname === item.path
                     ? "bg-primary/10 text-primary border-l-4 border-primary"
                     : "text-gray-600 hover:bg-gray-100"
                   }`}
               >
-                <span className={`mr-3 ${location.pathname.includes(item.path)
+                <span className={`mr-3 ${location.pathname === item.path
                     ? "text-primary"
                     : "text-gray-500"
                   }`}>

@@ -30,20 +30,82 @@ export class DashboardService {
       return createdAt && createdAt >= startOfMonth && createdAt <= endOfMonth;
     }).length;
 
-    // Lấy tất cả sản phẩm
+    // Lấy tất cả sản phẩm (đã populate variants)
     const products = await this.productService.findAll();
-    // Tổng tồn kho
-    const productsInStock = products.reduce((sum, product: any) => sum + (product.stock_quantity || 0), 0);
-    // Sản phẩm bán chạy nhất (top 5 theo sold)
-    const bestSellingProducts = products
-      .sort((a: any, b: any) => (b.sold || 0) - (a.sold || 0))
+    // Tổng tồn kho dựa trên variant
+    let productsInStock = 0;
+    const lowStockProducts: any[] = [];
+    const outOfStockProducts: any[] = [];
+    const LOW_STOCK_THRESHOLD = 5;
+    products.forEach((product: any) => {
+      let totalStock = 0;
+      if (product.variants && product.variants.length > 0) {
+        totalStock = product.variants.reduce((sum: number, variant: any) => sum + (variant.quantity || 0), 0);
+      } else {
+        totalStock = product.stock_quantity || 0;
+      }
+      productsInStock += totalStock;
+      if (totalStock === 0) {
+        outOfStockProducts.push({
+          name: product.name,
+          totalStock,
+          variants: (product.variants || []).map((v: any) => ({ name: v.color || v.dimensions || '', stock: v.quantity || 0 }))
+        });
+      } else if (totalStock <= LOW_STOCK_THRESHOLD) {
+        lowStockProducts.push({
+          name: product.name,
+          totalStock,
+          variants: (product.variants || []).map((v: any) => ({ name: v.color || v.dimensions || '', stock: v.quantity || 0 }))
+        });
+      }
+    });
+
+    // Sản phẩm bán chạy nhất (top 5 theo sold, tính theo variant nếu có)
+    // Lấy tất cả order items
+    const orderItems = orders.flatMap((order: any) => order.items || []);
+    // Map: {variantId: {productName, variantName, sold}}
+    const variantSalesMap = new Map();
+    const productSalesMap = new Map();
+    orderItems.forEach((item: any) => {
+      if (item.variant_id) {
+        const key = item.variant_id._id?.toString() || item.variant_id?.toString();
+        const productName = item.product_id?.name || '';
+        const variantName = item.variant_id?.color || item.variant_id?.dimensions || '';
+        const stock = item.variant_id.quantity;
+
+        if (!variantSalesMap.has(key)) {
+          variantSalesMap.set(key, { productName, variantName, sold: 0, stock});
+        }
+        variantSalesMap.get(key).sold += item.quantity;
+      } else {
+        // Không có variant, tính theo product
+        const key = item.product_id?._id?.toString() || item.product_id?.toString();
+        const productName = item.product_id?.name || '';
+        if (!productSalesMap.has(key)) {
+          productSalesMap.set(key, { productName, sold: 0, stock: item.product_id.stock_quantity });
+        }
+        productSalesMap.get(key).sold += item.quantity;
+      }
+    });
+    // Lấy top 5 variant bán chạy nhất
+    let bestSellingProducts = Array.from(variantSalesMap.values())
+      .sort((a, b) => b.sold - a.sold)
       .slice(0, 5);
+    // Nếu chưa đủ 5, bổ sung thêm product không có variant
+    if (bestSellingProducts.length < 5) {
+      const more = Array.from(productSalesMap.values())
+        .sort((a, b) => b.sold - a.sold)
+        .slice(0, 5 - bestSellingProducts.length);
+      bestSellingProducts = bestSellingProducts.concat(more);
+    }
 
     return {
       totalOrders,
       totalRevenue,
       newCustomers,
       productsInStock,
+      lowStockProducts,
+      outOfStockProducts,
       recentOrders,
       bestSellingProducts
     };

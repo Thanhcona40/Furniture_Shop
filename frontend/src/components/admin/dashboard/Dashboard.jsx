@@ -33,7 +33,7 @@ const Dashboard = () => {
         <StatCard label="Tổng đơn hàng" value={summary.totalOrders} />
         <StatCard label="Tổng doanh thu" value={summary.totalRevenue.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'})} />
         <StatCard label="Khách mới trong tháng" value={summary.newCustomers} />
-        <StatCard label="Tồn kho" value={summary.productsInStock} />
+        <StatCard label="Tồn kho" value={summary.productsInStock} infoDetail={{ lowStockProducts: summary.lowStockProducts, outOfStockProducts: summary.outOfStockProducts }} />
       </div>
       <DashboardChart />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
