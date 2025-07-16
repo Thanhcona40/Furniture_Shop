@@ -2,7 +2,7 @@ import axios from "axios"
 import { toast } from "react-toastify"
 
 
-export const API_BASE_URL = "http://localhost:3000"
+export const API_BASE_URL = 'https://furniture-shop-x2n4.onrender.com/';
 
 export const api = axios.create({
         baseURL: API_BASE_URL,

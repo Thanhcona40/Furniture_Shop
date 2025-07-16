@@ -10,6 +10,7 @@ import OrderSummary from '../components/checkout/OrderSummary';
 import { createOrderAction } from '../redux/actions/orderActions';
 import { removeCartItemsAction } from '../redux/actions/cartActions';
 import { getDefaultAddress, getUserAddresses } from '../api/address';
+import paymentApi from '../api/payment';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -111,7 +112,21 @@ const Checkout = () => {
         total
       };
 
-      await dispatch(createOrderAction(orderData)).unwrap();
+      if (paymentMethod === 'cod') {
+        await dispatch(createOrderAction(orderData)).unwrap();
+      } else if (paymentMethod === 'online') {
+        // Gọi API backend để lấy link VNPAY
+        const res = await paymentApi.createVnpayUrl({
+          amount: total,
+          // orderId: có thể truyền mã đơn hàng nếu đã tạo trước, hoặc để backend tự sinh
+          ipAddr: window.location.hostname
+        });
+        if (res.paymentUrl) {
+          window.location.href = res.paymentUrl;
+        } else {
+          message.error('Không tạo được link thanh toán!');
+        }
+      }
     } catch (error) {
       console.error('Order error:', error);
     } finally {
