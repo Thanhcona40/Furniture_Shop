@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Divider, Radio, Space, message } from 'antd';
-import { ArrowLeftOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { message } from 'antd';
+import { ShoppingCartOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import AddressForm from '../components/checkout/AddressForm';
 import PaymentMethod from '../components/checkout/PaymentMethod';
@@ -127,11 +127,9 @@ const Checkout = () => {
         const res = await paymentApi.createVnpayUrl({
           amount: total,
           orderId: order._id,
-          ipAddr: window.location.hostname
+          ipAddr: '127.0.0.1'
         });
-        console.log("response create vnpayurl: ", res)
         if (res.paymentUrl) {
-          console.log("url return vnpay: ", res.paymentUrl)
           window.location.href = res.paymentUrl;
         } else {
           message.error('Không tạo được link thanh toán!');
