@@ -21,8 +21,8 @@ export class PaymentService {
       vnp_TmnCode: vnpayConfig.vnp_TmnCode,
       vnp_Locale: 'vn',
       vnp_CurrCode: 'VND',
-      vnp_TxnRef: order._id || Math.floor(Math.random() * 1000000).toString(),
-      vnp_OrderInfo: `Thanh toan don hang ${order._id}`,
+      vnp_TxnRef: order.orderId || order._id || Math.floor(Math.random() * 1000000).toString(),
+      vnp_OrderInfo: `Thanh toan don hang ${order.orderId}`,
       vnp_OrderType: 'other',
       vnp_Amount: order.amount * 100, // VNPAY yêu cầu nhân 100
       vnp_ReturnUrl: vnpayConfig.vnp_ReturnUrl,
