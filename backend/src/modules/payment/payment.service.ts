@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as qs from 'qs';
 import * as crypto from 'crypto';
 import { vnpayConfig } from './vnpay.config';
-import moment from 'moment';
+import * as moment from 'moment';
 
 @Injectable()
 export class PaymentService {
