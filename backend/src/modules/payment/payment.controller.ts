@@ -38,6 +38,7 @@ export class PaymentController {
     console.log('VNPAY CREATE URL:');
     console.log('signData:', signData);
     console.log('secureHash:', secureHash);
+    console.log('VNPAY RETURN QUERY:', query);
 
     const isValid = vnp_SecureHash === secureHash;
 

@@ -129,7 +129,9 @@ const Checkout = () => {
           orderId: order._id,
           ipAddr: window.location.hostname
         });
+        console.log("response create vnpayurl: ", res)
         if (res.paymentUrl) {
+          console.log("url return vnpay: ", res.paymentUrl)
           window.location.href = res.paymentUrl;
         } else {
           message.error('Không tạo được link thanh toán!');
