@@ -40,6 +40,10 @@ export class PaymentService {
     const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret);
     const secureHash = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
+    console.log('VNPAY CREATE URL:');
+    console.log('signData:', signData);
+    console.log('secureHash:', secureHash);
+
     // Thêm secureHash vào params
     sortedParams['vnp_SecureHash'] = secureHash;
     const paymentUrl = `${vnpayConfig.vnp_Url}?${qs.stringify(sortedParams, { encode: true })}`;

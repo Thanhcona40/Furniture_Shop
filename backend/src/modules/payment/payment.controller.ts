@@ -3,6 +3,7 @@ import { PaymentService } from './payment.service';
 import { vnpayConfig } from './vnpay.config';
 import * as crypto from 'crypto';
 import { OrderService } from '../order/order.service';
+import * as qs from 'qs';
 
 @Controller('payment')
 export class PaymentController {
@@ -30,12 +31,13 @@ export class PaymentController {
       .sort()
       .reduce((r, k) => ((r[k] = query[k]), r), {} as any);
 
-    // Tạo chuỗi dữ liệu để xác thực
-    const signData = Object.entries(sortedParams)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('&');
+    // Tạo chuỗi dữ liệu để xác thực (dùng qs.stringify giống service)
+    const signData = qs.stringify(sortedParams, { encode: false });
     const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret);
     const secureHash = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
+    console.log('VNPAY CREATE URL:');
+    console.log('signData:', signData);
+    console.log('secureHash:', secureHash);
 
     const isValid = vnp_SecureHash === secureHash;
 
