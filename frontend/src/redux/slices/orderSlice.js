@@ -28,6 +28,13 @@ const orderSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Reset toàn bộ state khi nhận action resetOrder
+      .addCase('order/resetOrder', (state) => {
+        state.orders = [];
+        state.currentOrder = null;
+        state.status = 'idle';
+        state.error = null;
+      })
       // Create Order
       .addCase(createOrderAction.pending, handlePending)
       .addCase(createOrderAction.fulfilled, (state, action) => {

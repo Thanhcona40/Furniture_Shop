@@ -11,6 +11,7 @@ import { createOrderAction } from '../redux/actions/orderActions';
 import { removeCartItemsAction } from '../redux/actions/cartActions';
 import { getDefaultAddress, getUserAddresses } from '../api/address';
 import paymentApi from '../api/payment';
+import { resetOrderAction } from '../redux/actions/orderActions';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -66,6 +67,11 @@ const Checkout = () => {
     }
   }, [status, error, loading, currentOrder, dispatch, selectedItemIds, navigate]);
 
+  // Reset trạng thái order khi vào lại trang Checkout
+  useEffect(() => {
+    dispatch(resetOrderAction());
+  }, [dispatch]);
+
   useEffect(() => {
     if (user?._id) {
       getDefaultAddress()
@@ -114,11 +120,13 @@ const Checkout = () => {
 
       if (paymentMethod === 'cod') {
         await dispatch(createOrderAction(orderData)).unwrap();
-      } else if (paymentMethod === 'online') {
-        // Gọi API backend để lấy link VNPAY
+      } else if (paymentMethod === 'bank') {
+        // Bước 1: Tạo đơn hàng trước (trạng thái chờ thanh toán)
+        const order = await dispatch(createOrderAction(orderData)).unwrap();
+        // Bước 2: Gọi API backend để lấy link VNPAY với orderId
         const res = await paymentApi.createVnpayUrl({
           amount: total,
-          // orderId: có thể truyền mã đơn hàng nếu đã tạo trước, hoặc để backend tự sinh
+          orderId: order._id,
           ipAddr: window.location.hostname
         });
         if (res.paymentUrl) {
@@ -157,6 +165,7 @@ const Checkout = () => {
                     onChange={handleAddressChange}
                     defaultAddress={defaultAddress}
                     addressList={addressList}
+                    editableEmail={false}
                   />
                 </div>
               </div>
