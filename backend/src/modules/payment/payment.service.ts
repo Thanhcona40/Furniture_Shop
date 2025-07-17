@@ -7,9 +7,9 @@ import * as moment from 'moment';
 @Injectable()
 export class PaymentService {
   createVnpayPaymentUrl(order: any): string {
-    const date = new Date();
-    const createDate = moment(date).format('YYYYMMDDHHmmss');
-    const expireDate = moment(date).add(15, 'minutes').format('YYYYMMDDHHmmss')
+    const now = moment().utcOffset(7); // Lấy giờ Việt Nam
+    const createDate = now.format('YYYYMMDDHHmmss');
+    const expireDate = now.clone().add(15, 'minutes').format('YYYYMMDDHHmmss');
 
     const vnp_Params: any = {
       vnp_Version: '2.1.0',

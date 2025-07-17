@@ -130,6 +130,7 @@ const Checkout = () => {
           ipAddr: '127.0.0.1'
         });
         if (res.paymentUrl) {
+          console.log("res: ", res)
           window.location.href = res.paymentUrl;
         } else {
           message.error('Không tạo được link thanh toán!');
