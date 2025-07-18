@@ -29,6 +29,7 @@ export class PaymentService {
 
     // Build query string theo đúng mẫu VNPAY
     const redirectUrl = new URL(vnpayConfig.vnp_Url);
+    
     Object.entries(vnp_Params)
       .sort(([key1], [key2]) => key1.localeCompare(key2))
       .forEach(([key, value]) => {
