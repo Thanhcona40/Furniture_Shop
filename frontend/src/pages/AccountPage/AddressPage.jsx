@@ -260,6 +260,7 @@ const AddressPage = () => {
           <AddressForm
             defaultAddress={editingAddress}
             onChange={setFormData}
+            editableEmail={true}
           />
         </DialogContent>
         <DialogActions className="p-4">

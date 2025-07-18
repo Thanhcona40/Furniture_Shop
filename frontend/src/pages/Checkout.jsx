@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Divider, Radio, Space, message } from 'antd';
-import { ArrowLeftOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { message } from 'antd';
+import { ShoppingCartOutlined } from '@ant-design/icons';
 import { toast } from 'react-toastify';
 import AddressForm from '../components/checkout/AddressForm';
 import PaymentMethod from '../components/checkout/PaymentMethod';
@@ -10,6 +10,8 @@ import OrderSummary from '../components/checkout/OrderSummary';
 import { createOrderAction } from '../redux/actions/orderActions';
 import { removeCartItemsAction } from '../redux/actions/cartActions';
 import { getDefaultAddress, getUserAddresses } from '../api/address';
+import paymentApi from '../api/payment';
+import { resetOrderAction } from '../redux/actions/orderActions';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -65,6 +67,11 @@ const Checkout = () => {
     }
   }, [status, error, loading, currentOrder, dispatch, selectedItemIds, navigate]);
 
+  // Reset trạng thái order khi vào lại trang Checkout
+  useEffect(() => {
+    dispatch(resetOrderAction());
+  }, [dispatch]);
+
   useEffect(() => {
     if (user?._id) {
       getDefaultAddress()
@@ -111,7 +118,24 @@ const Checkout = () => {
         total
       };
 
-      await dispatch(createOrderAction(orderData)).unwrap();
+      if (paymentMethod === 'cod') {
+        await dispatch(createOrderAction(orderData)).unwrap();
+      } else if (paymentMethod === 'bank') {
+        // Bước 1: Tạo đơn hàng trước (trạng thái chờ thanh toán)
+        const order = await dispatch(createOrderAction(orderData)).unwrap();
+        // Bước 2: Gọi API backend để lấy link VNPAY với orderId
+        const res = await paymentApi.createVnpayUrl({
+          amount: total,
+          orderId: order._id,
+          ipAddr: '127.0.0.1'
+        });
+        if (res.paymentUrl) {
+          console.log("res: ", res)
+          window.location.href = res.paymentUrl;
+        } else {
+          message.error('Không tạo được link thanh toán!');
+        }
+      }
     } catch (error) {
       console.error('Order error:', error);
     } finally {
@@ -142,6 +166,7 @@ const Checkout = () => {
                     onChange={handleAddressChange}
                     defaultAddress={defaultAddress}
                     addressList={addressList}
+                    editableEmail={false}
                   />
                 </div>
               </div>

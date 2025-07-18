@@ -10,10 +10,10 @@ const PaymentMethod = ({ value, onChange }) => (
           <div className="text-sm text-gray-500">Thanh toán bằng tiền mặt khi nhận hàng</div>
         </div>
       </Radio>
-      <Radio value="bank" disabled className="w-full">
+      <Radio value="bank" className="w-full">
         <div>
-          <div className="font-medium">Chuyển khoản ngân hàng</div>
-          <div className="text-sm text-gray-500">Chức năng đang phát triển</div>
+          <div className="font-medium">Thanh toán online qua VNPAY</div>
+          <div className="text-sm text-gray-500">Chuyển khoản, quét mã QR, thẻ ATM, Visa/MasterCard, ...</div>
         </div>
       </Radio>
     </Space>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
@@ -9,7 +9,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { getProvinces, getDistricts, getWards } from '../../api/address';
 
-const AddressForm = ({ defaultAddress, onChange, addressList }) => {
+const AddressForm = ({ defaultAddress, onChange, addressList, editableEmail = false }) => {
   const location = useLocation();
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
@@ -25,6 +25,7 @@ const AddressForm = ({ defaultAddress, onChange, addressList }) => {
     is_default: false,
     _id: ''
   });
+  const prevFormRef = useRef();
 
   // Load provinces on mount
   useEffect(() => {
@@ -95,7 +96,7 @@ useEffect(() => {
     }
   }, [defaultAddress]);
 
-  // Callback onChange
+  // Callback onChange - chỉ gọi khi dữ liệu thực sự thay đổi
   useEffect(() => {
     if (onChange) {
       const formattedData = {
@@ -108,7 +109,10 @@ useEffect(() => {
         ward_id: form.ward_id,
         is_default: form.is_default
       };
-      onChange(formattedData);
+      if (JSON.stringify(prevFormRef.current) !== JSON.stringify(formattedData)) {
+        onChange(formattedData);
+        prevFormRef.current = formattedData;
+      }
     }
   }, [form, onChange]);
 
@@ -160,8 +164,8 @@ useEffect(() => {
         value={form.email}
         onChange={e => handleChange('email', e.target.value)}
         margin="normal"
-        disabled
-        className='bg-gray-300'
+        disabled={!editableEmail}
+        className={!editableEmail ? 'bg-gray-300' : ''}
       />
       <TextField
         fullWidth

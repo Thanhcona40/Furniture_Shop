@@ -51,4 +51,9 @@ export const cancelOrderAction = createAsyncThunk(
       return rejectWithValue(error.response?.data?.message || 'Có lỗi xảy ra khi hủy đơn hàng');
     }
   }
-); 
+);
+
+// Action reset trạng thái order
+export const resetOrderAction = () => ({
+  type: 'order/resetOrder',
+}); 

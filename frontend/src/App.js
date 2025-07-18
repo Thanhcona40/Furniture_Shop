@@ -32,6 +32,7 @@ import Order from './pages/AccountPage/Order';
 import AddressPage from './pages/AccountPage/AddressPage';
 import ChangePassword from './pages/AccountPage/ChangePassword';
 import { WebSocketProvider } from './contexts/WebSocketContext';
+import PaymentResult from './pages/PaymentResult';
 
 function App() {
   const location = useLocation();
@@ -75,6 +76,7 @@ function App() {
           <Route path='register' element={<PublicRoute><Register /></PublicRoute>} />
         </Route>
         <Route path='/checkout' element={<PrivateRoute><Checkout /></PrivateRoute>} />
+        <Route path='/payment-result' element={<PaymentResult />} />
       </Routes>
       <ToastContainer position="top-center" autoClose={3000} />
     </WebSocketProvider>

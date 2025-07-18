@@ -52,7 +52,7 @@ export const WebSocketProvider = ({ children }) => {
   // Kết nối websocket
   useEffect(() => {
     if (token) {
-      const newSocket = io('http://localhost:3000', {
+      const newSocket = io('https://furniture-shop-x2n4.onrender.com', {
         auth: {
           token: token,
         },
