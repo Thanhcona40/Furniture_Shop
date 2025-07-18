@@ -27,36 +27,27 @@ export class PaymentService {
       vnp_ReturnUrl: vnpayConfig.vnp_ReturnUrl,
     };
 
-    // Sort params alphabetically
-    const sortedParams = Object.keys(vnp_Params)
-      .sort()
-      .reduce((r, k) => ((r[k] = vnp_Params[k]), r), {} as any);
+    // Build query string theo đúng mẫu VNPAY
+    const redirectUrl = new URL(vnpayConfig.vnp_Url);
+    Object.entries(vnp_Params)
+      .sort(([key1], [key2]) => key1.localeCompare(key2))
+      .forEach(([key, value]) => {
+        if (!value || value === "" || value === undefined || value === null) return;
+        redirectUrl.searchParams.append(key, value.toString());
+      });
 
-    // Build signData string
-    const signData = qs.stringify(sortedParams, { encode: false });
+    // Ký signData bằng query string đã encode
+    const signData = redirectUrl.search.slice(1); // Bỏ dấu ?
     const hmac = crypto.createHmac('sha512', vnpayConfig.vnp_HashSecret);
     const secureHash = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
     console.log("signData: ", signData)
     console.log("vnp_HashSecret:", vnpayConfig.vnp_HashSecret);
     console.log("secureHash:", secureHash);
+    // Thêm vnp_SecureHash vào cuối
+    redirectUrl.searchParams.append('vnp_SecureHash', secureHash);
 
-    // Add secureHash to params
-    sortedParams['vnp_SecureHash'] = secureHash;
-
-    // Build VNPAY URL với encode chuẩn (khoảng trắng thành +)
-    function buildVnpUrl(baseUrl: string, params: Record<string, any>) {
-      const keys = Object.keys(params).sort();
-      const arr: string[] = [];
-      for (const key of keys) {
-        let value = params[key];
-        value = encodeURIComponent(value).replace(/%20/g, "+");
-        arr.push(`${key}=${value}`);
-      }
-      return `${baseUrl}?${arr.join("&")}`;
-    }
-
-    const paymentUrl = buildVnpUrl(vnpayConfig.vnp_Url, sortedParams);
-    return paymentUrl;
+    // Trả về URL hoàn chỉnh
+    return redirectUrl.toString();
   }
 }
