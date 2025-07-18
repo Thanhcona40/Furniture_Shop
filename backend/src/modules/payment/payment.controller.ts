@@ -16,6 +16,7 @@ export class PaymentController {
   createVnpayUrl(@Body() body: any) {
     // body nên chứa: amount, orderId, ipAddr, ...
     const paymentUrl = this.paymentService.createVnpayPaymentUrl(body);
+    console.log("paymentUrrl: ", paymentUrl);
     return { paymentUrl };
   }
 
