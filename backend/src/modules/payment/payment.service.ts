@@ -43,7 +43,20 @@ export class PaymentService {
 
     // Add secureHash to params
     sortedParams['vnp_SecureHash'] = secureHash;
-    const paymentUrl = `${vnpayConfig.vnp_Url}?${qs.stringify(sortedParams, { encode: true })}`;
+
+    // Build VNPAY URL với encode chuẩn (khoảng trắng thành +)
+    function buildVnpUrl(baseUrl: string, params: Record<string, any>) {
+      const keys = Object.keys(params).sort();
+      const arr: string[] = [];
+      for (const key of keys) {
+        let value = params[key];
+        value = encodeURIComponent(value).replace(/%20/g, "+");
+        arr.push(`${key}=${value}`);
+      }
+      return `${baseUrl}?${arr.join("&")}`;
+    }
+
+    const paymentUrl = buildVnpUrl(vnpayConfig.vnp_Url, sortedParams);
     return paymentUrl;
   }
 }
