@@ -38,6 +38,8 @@ export class PaymentService {
     const secureHash = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
     console.log("signData: ", signData)
+    console.log("vnp_HashSecret:", vnpayConfig.vnp_HashSecret);
+    console.log("secureHash:", secureHash);
 
     // Add secureHash to params
     sortedParams['vnp_SecureHash'] = secureHash;
