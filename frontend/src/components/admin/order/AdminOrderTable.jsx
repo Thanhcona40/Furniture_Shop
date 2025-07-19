@@ -1,12 +1,13 @@
 import React from 'react';
 import { statusColor, statusLabel, statusBg } from '../../../utils/orderConstants';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const AdminOrderTable = ({ orders, loading, onViewDetail }) => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-40">
-        <span>Đang tải...</span>
+        <CircularProgress />
       </div>
     );
   }

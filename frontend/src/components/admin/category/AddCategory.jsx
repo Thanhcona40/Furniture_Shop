@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { uploadToCloudinary } from '../../../utils/uploadToCloudinary';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const AddCategory = ({ onAdd, open, onClose }) => {
   const [newCategory, setNewCategory] = useState({
@@ -78,7 +79,7 @@ const AddCategory = ({ onAdd, open, onClose }) => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Hình ảnh</label>
               <div className="flex items-center space-x-4">
                 <label className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-                  {isUploading ? 'Đang tải lên...' : 'Chọn ảnh'}
+                  {isUploading ? <><CircularProgress size={16} sx={{mr:1}} /> Đang tải lên...</> : 'Chọn ảnh'}
                   <input 
                     type="file" 
                     className="sr-only" 

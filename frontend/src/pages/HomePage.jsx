@@ -7,6 +7,7 @@ import GoodTrick from '../components/Home/GoodTrick';
 import { useEffect, useState } from 'react';
 import { getProducts } from '../api/product';
 import {toast} from 'react-toastify'
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 const HomePage = () => {
@@ -31,7 +32,7 @@ const HomePage = () => {
         }
     }, [products]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div className="flex justify-center"><CircularProgress /></div>;
 
     return (
         <>

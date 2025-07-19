@@ -4,6 +4,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const statusLabels = {
   pending: 'Chờ xác nhận',
@@ -28,7 +29,7 @@ const UserOrderStatusModal = ({ open, onClose, user, orderStatusCount }) => {
             ))}
           </div>
         ) : (
-          <div>Đang tải...</div>
+          <div className="flex justify-center"><CircularProgress size={20} /></div>
         )}
       </DialogContent>
       <DialogActions>

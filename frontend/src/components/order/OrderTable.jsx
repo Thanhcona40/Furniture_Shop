@@ -8,6 +8,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const OrderTable = ({ orders, addressCache, onShowDetail, onCancelOrder, getStatusColor, getStatusText, getPaymentText }) => {
   return (
@@ -63,7 +64,7 @@ const OrderTable = ({ orders, addressCache, onShowDetail, onCancelOrder, getStat
                   {order.total.toLocaleString('vi-VN')}đ
                 </TableCell>
                 <TableCell sx={{ textAlign: 'center', border: '1px solid #d1d5db', padding: '8px 16px' }}>
-                  {addressCache[order._id] || order.shipping_address.detail || 'Đang tải...'}
+                  {addressCache[order._id] || order.shipping_address.detail || <CircularProgress size={16} />}
                 </TableCell>
                 <TableCell sx={{ textAlign: 'center', border: '1px solid #d1d5db', padding: '8px 16px' }}>
                   <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>

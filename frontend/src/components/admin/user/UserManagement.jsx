@@ -4,6 +4,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import SimpleConfirmDialog from './SimpleConfirmDialog';
 import { deleteUser } from '../../../api/user';
 import UserOrderStatusModal from './UserOrderStatusModal';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -78,7 +79,7 @@ const UserManagement = () => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Quản lý Người dùng</h1>
       {loading ? (
-        <div>Đang tải...</div>
+        <div className="flex justify-center"><CircularProgress /></div>
       ) : error ? (
         <div className="text-red-500">{error}</div>
       ) : (
@@ -113,7 +114,7 @@ const UserManagement = () => {
                         </button>
                       </>
                     ) : (
-                      <span className="text-xs text-gray-400">Đang tải...</span>
+                      <span className="text-xs text-gray-400 flex items-center gap-1"><CircularProgress size={14} /> Đang tải...</span>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

@@ -1,11 +1,14 @@
 import React from 'react';
 import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
 import { statusColor, statusLabel } from '../../utils/orderConstants';
 
 const OrderDetailInfo = ({ address, shippingAddress, subtotal, shippingFee, total, orderTrack = [] }) => (
   <>
     <div className="mb-2 text-sm text-gray-600">
-      <div>Địa chỉ giao: {address || shippingAddress?.detail || 'Đang tải...'}</div>
+      <div>
+        Địa chỉ giao: {address || shippingAddress?.detail || <CircularProgress size={16} />}
+      </div>
     </div>
     <div className="flex justify-between mt-4 text-base">
       <div>Tạm tính: {subtotal.toLocaleString('vi-VN')}đ</div>
