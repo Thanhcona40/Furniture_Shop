@@ -131,6 +131,8 @@ const Checkout = () => {
         });
         if (res.paymentUrl) {
           console.log("res: ", res)
+          // Lưu danh sách item đã chọn để thanh toán
+          localStorage.setItem('selectedItemsForPayment', JSON.stringify(selectedItemIds));
           window.location.href = res.paymentUrl;
         } else {
           message.error('Không tạo được link thanh toán!');
