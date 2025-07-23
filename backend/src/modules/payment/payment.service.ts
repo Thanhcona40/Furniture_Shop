@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import * as qs from 'qs';
 import * as crypto from 'crypto';
 import { vnpayConfig } from './vnpay.config';
 import * as moment from 'moment';
@@ -17,7 +16,7 @@ export class PaymentService {
       vnp_TmnCode: vnpayConfig.vnp_TmnCode,
       vnp_Amount: order.amount * 100,
       vnp_TxnRef: order.orderId || order._id || Math.floor(Math.random() * 1000000).toString(),
-      vnp_OrderInfo: `Thanh toan don hang ${order.orderId || order._id || ''}`,
+      vnp_OrderInfo: `Thanh toan don hang ${order.orderId || ''}`,
       vnp_OrderType: 'other',
       vnp_IpAddr: order.ipAddr,
       vnp_CreateDate: createDate,

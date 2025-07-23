@@ -40,16 +40,6 @@ export class PaymentController {
 
     const isValid = vnp_SecureHash === secureHash;
 
-    let updateResult: any = null;
-    if (isValid && query.vnp_ResponseCode === '00') {
-      // vnp_TxnRef là orderId
-      try {
-        updateResult = await this.orderService.updateOrderStatus(query.vnp_TxnRef, 'confirmed');
-      } catch (err) {
-        updateResult = { error: err.message };
-      }
-    }
-
     return {
       isValid,
       vnp_ResponseCode: query.vnp_ResponseCode,
@@ -57,7 +47,6 @@ export class PaymentController {
       message: isValid
         ? 'Xác thực thành công callback từ VNPAY.'
         : 'Sai chữ ký callback từ VNPAY!',
-      updatedOrder: updateResult,
       query,
     };
   }

@@ -55,19 +55,6 @@ const Checkout = () => {
     }
   }, [user, navigate]);
 
-  // Xử lý kết quả đặt hàng
-  useEffect(() => {
-    if (status === 'succeeded' && currentOrder && !loading) {
-      toast.success(`Bạn đã đặt hàng thành công! Đây là mã đơn hàng: ${currentOrder.order_code}`);
-      dispatch(removeCartItemsAction(selectedItemIds));
-      dispatch(resetOrderAction())
-      navigate('/');
-    }
-    if (status === 'failed' && error) {
-      message.error(error);
-    }
-  }, [status, error, loading, currentOrder, dispatch, selectedItemIds, navigate]);
-
   useEffect(() => {
     if (user?._id) {
       getDefaultAddress()
@@ -116,6 +103,16 @@ const Checkout = () => {
 
       if (paymentMethod === 'cod') {
         await dispatch(createOrderAction(orderData)).unwrap();
+        const order = await dispatch(createOrderAction(orderData)).unwrap();
+        if (order && order._id) {
+          toast.success(`Bạn đã đặt hàng thành công! Mã đơn: ${order.order_code}`);
+          dispatch(removeCartItemsAction(selectedItemIds));
+          dispatch(resetOrderAction());
+          navigate('/');
+        } else {
+          toast.error('Không tạo được đơn hàng!');
+          navigate('/cart');
+        }
       } else if (paymentMethod === 'bank') {
         // Bước 1: Tạo đơn hàng trước (trạng thái chờ thanh toán)
         const order = await dispatch(createOrderAction(orderData)).unwrap();
