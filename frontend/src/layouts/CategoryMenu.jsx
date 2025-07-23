@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCategories } from "../api/category";
 
