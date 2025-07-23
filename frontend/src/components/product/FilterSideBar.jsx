@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
 
-const brands = ["Luxury", "Woody", "Euro", "Hobu","Poplar", "Tabu","Miso"];
 const prices = [
   { label: "Dưới 100.000₫", value: "under-100" },
   { label: "100.000₫ - 200.000₫", value: "100-200" },
@@ -181,29 +180,6 @@ const FilterSidebar = ({ onChange, filters, onFilterChange }) => {
           <Link to="/contact" className={isActive("/contact") ? "text-primary font-semibold" : "text-black"}>
             LIÊN HỆ
           </Link>
-        </div>
-      </div>
-
-      <div>
-        <div className="relative mb-4">
-          <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gray-200 z-0"></div>
-          <h3 className="relative z-10 inline-block bg-primary text-white text-xl font-normal px-4 py-2 skew-x-[-12deg]">
-            <span className="inline-block skew-x-[12deg]">THƯƠNG HIỆU</span>
-          </h3>
-        </div>
-
-        <div className="border border-primary p-2 rounded-lg">
-          {brands.map((brand) => (
-            <label key={brand} className="flex items-center gap-2 cursor-pointer p-3">
-              <input
-                type="checkbox"
-                className="appearance-none w-4 h-4 rounded-full border border-gray-300  checked:bg-primary"
-                checked={selectedBrands.includes(brand)}
-                onChange={() => handleBrandChange(brand)}
-              />
-              <p className='text-sm'>{brand}</p>
-            </label>
-          ))}
         </div>
       </div>
 

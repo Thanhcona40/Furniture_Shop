@@ -16,19 +16,19 @@ const ProductListPage = () => {
     
     useEffect(() => {
         if (!products?.length) {
-        const fetchProducts = async () => {
-            try {
-            const response = await getProducts();
-            setProducts(response.data);
-            setLoading(false);
-            } catch (err) {
-            toast.error(err?.response?.data?.message);
-            setLoading(false);
-            }
-        };
-        fetchProducts();
+          const fetchProducts = async () => {
+              try {
+              const response = await getProducts();
+              setProducts(response.data);
+              setLoading(false);
+              } catch (err) {
+              toast.error(err?.response?.data?.message);
+              setLoading(false);
+              }
+          };
+          fetchProducts();
         } else {
-        setLoading(false);
+          setLoading(false);
         }
     }, [products]);
 
@@ -82,7 +82,7 @@ const ProductListPage = () => {
             </div>
             <div className="w-3/4">
                 <h1 className="text-2xl font-bold mb-4 ml-5">{category}</h1>
-                <div className="grid grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4">
+                <div className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4">
                     {filterProducts().map((item) => (
                         <ProductCard key={item.id} product={item} />
                     ))}
