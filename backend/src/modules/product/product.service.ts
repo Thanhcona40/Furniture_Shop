@@ -161,10 +161,34 @@ export class ProductService {
     return products;
   }
 
-  async updateMissingFeaturedField() {
-  return this.productModel.updateMany(
-    { is_featured: { $exists: false } },
-    { $set: { is_featured: false } }
-  );
-}
+  async getFeaturedProducts(): Promise<Product[]> {
+    const featuredProducts = await this.productModel
+      .find({ is_featured: true })
+      .populate('category_id', '_id name')
+      .populate('variants')
+      .exec();
+    return featuredProducts;
+  }
+
+  async getHotProducts(): Promise<Product[]> {
+    const hotProducts = await this.productModel
+      .find()
+      .sort({ sold: -1 }) // Sắp xếp theo số lượng đã bán giảm dần
+      .limit(10) // Giới hạn 10 sản phẩm hot nhất
+      .populate('category_id', '_id name')
+      .populate('variants')
+      .exec();
+    return hotProducts;
+  }
+
+  async getNewProducts(): Promise<Product[]> {
+    const newProducts = await this.productModel
+      .find()
+      .sort({ createdAt: -1 }) // Sắp xếp theo ngày tạo mới nhất
+      .limit(10) // Giới hạn 10 sản phẩm mới nhất
+      .populate('category_id', '_id name')
+      .populate('variants')
+      .exec();
+    return newProducts;
+  }
 }

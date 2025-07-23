@@ -12,6 +12,6 @@ export const deleteVariant = (variantId) => api.delete(`/products/variants/${var
 
 export const searchProducts = (keyword) => api.get(`/products/search?q=${encodeURIComponent(keyword)}`);
 
-export const toggleFeaturedProduct = (id, is_featured) => {
-  return api.patch(`/products/${id}/featured`, { is_featured });
-};
+export const getFeaturedProducts = () => api.get('/products/featured');
+export const getHotProducts = () => api.get('/products/hot');
+export const getNewProducts = () => api.get('/products/new');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProductCard from '../product/ProductCard';
 import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -16,14 +16,20 @@ const categories = [
     { label: 'Bàn', value: 'ban' },
 ];
 
-const HotProduct = ({products}) => {
-    const [selectedCategory, setSelectedCategory] = useState('all');
+const HotProduct = () => {
     const navigate = useNavigate();
-
-    // Giả sử mỗi product có trường category (nếu chưa có, cần bổ sung ở backend)
-    const filteredProducts = selectedCategory === 'all'
-        ? products?.slice(1) || []
-        : (products?.slice(1).filter(p => p.category === selectedCategory) || []);
+    const [products, setProducts] = useState([]);
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await getHotProducts();
+                setProducts(response.data);
+            } catch (error) {
+                console.error('Error fetching hot products:', error);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     const productInitial = products?.[0] || null;
 
@@ -68,7 +74,7 @@ const HotProduct = ({products}) => {
                     1024: { slidesPerView: 4 }
                   }}
                 >
-                  {filteredProducts.map((item) => (
+                  {products.map((item) => (
                     <SwiperSlide key={item.id}>
                       <ProductCard product={item} />
                     </SwiperSlide>

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ProductCard from '../product/ProductCard';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import { useNavigate } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { getNewProducts } from '../../api/product';
 
 const categories = [
     { label: 'Sofa', value: 'sofa' },
@@ -14,8 +15,20 @@ const categories = [
     { label: 'Bàn', value: 'ban' },
 ];
 
-const NewProduct = ({products}) => {
+const NewProduct = () => {
     const navigate = useNavigate();
+    const [products, setProducts] = React.useState([]);
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await getNewProducts();
+                setProducts(response.data);
+            } catch (error) {
+                console.error('Error fetching new products:', error);
+            }
+        };
+        fetchProducts();
+    }, []);
     return (
         <div className='max-w-[1110px] max-h-[600px]  mx-auto mb-5 px-4 flex flex-col lg:flex-row gap-10'>
             <div className='w-full'>

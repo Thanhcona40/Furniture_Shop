@@ -68,13 +68,23 @@ export class ProductController {
     return this.productsService.removeVariant(variantId);
   }
 
-  @Patch('/fix-featured')
-  async fixFeaturedField() {
-    return this.productsService.updateMissingFeaturedField();
-  }
-
   @Patch('/:id/featured')
   async toggleFeatured(@Param('id') id: string, @Body() body: { is_featured: boolean }) {
     return this.productsService.update(id, { is_featured: body.is_featured });
+  }
+
+  @Get('featured')
+  async getFeaturedProducts() {
+    return this.productsService.getFeaturedProducts();
+  }
+
+  @Get('hot')
+  async getHotProducts() {
+    return this.productsService.getHotProducts();
+  } 
+  
+  @Get('new')
+  async getNewProducts() {  
+    return this.productsService.getNewProducts();
   }
 }

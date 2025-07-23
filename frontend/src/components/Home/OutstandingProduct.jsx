@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ProductCard from '../product/ProductCard';
 import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { getFeaturedProducts } from '../../api/product';
 
 const categories = [
     { label: 'Sofa', value: 'sofa' },
@@ -16,9 +17,23 @@ const categories = [
     { label: 'Bàn', value: 'ban' },
 ];
 
-const OutstandingProduct = ({products}) => {
+const OutstandingProduct = () => {
+    const [products, setProducts] = React.useState([]);
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await getFeaturedProducts();
+                setProducts(response.data);
+            } catch (error) {
+                console.error('Error fetching featured products:', error);
+            }
+        };
+        fetchProducts();
+    }, []);
+
     const productInitial = products?.[0] || null;
     const navigate = useNavigate();
+
     return (
         <div className='max-w-[1110px] max-h-[600px]  mx-auto mb-5 px-4 flex flex-col lg:flex-row gap-10'>
             <div className='lg:w-1/3 w-full border border-primary p-4 inline-block'>
