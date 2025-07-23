@@ -16,12 +16,17 @@ export class DashboardService {
     // Lấy tất cả đơn hàng
     const orders = await this.orderService.getAllOrders();
     const totalOrders = orders.length;
-    const totalRevenue = orders.reduce((sum, order) => sum + (order.total || 0), 0);
+
+    // Tổng doanh thu từ tất cả đơn hàng giao thành công 
+    const totalRevenue = orders
+      .filter(order => order.status === 'delivered' && order.total)
+      .reduce((sum, order) => sum + (order.total || 0), 0);
+
+    // Lấy 5 đơn hàng gần đây nhất
     const recentOrders = orders.slice(0, 5);
 
-    // Lấy tất cả user
-    const users = await this.userService.getAllUsers();
     // Khách hàng mới trong tháng
+    const users = await this.userService.getAllUsers();
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
