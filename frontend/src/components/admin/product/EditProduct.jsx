@@ -39,7 +39,7 @@ const EditProduct = ({ open, onClose, product, onSave }) => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setNewProduct((prev) => ({
+    setEditedProduct((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
