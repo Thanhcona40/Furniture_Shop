@@ -35,8 +35,11 @@ const AddProduct = ({ onAdd, open, onClose }) => {
   }, []);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewProduct((prev) => ({ ...prev, [name]: type=== 'checkbox' ? checked : value }));
+    const { name, value, type, checked } = e.target;
+    setNewProduct((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
   };
 
   const handleImageChange = async (event) => {

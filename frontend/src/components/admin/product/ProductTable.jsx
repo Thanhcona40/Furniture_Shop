@@ -35,7 +35,7 @@ const ProductTable = ({ products, setProducts, onDelete, onGetAll, onEditModal }
       await toggleFeaturedProduct(productId, checked);
       setProducts((prev) =>
         prev.map((p) =>
-          p._id === product._id ? { ...p, is_featured: checked } : p
+          p._id === productId ? { ...p, is_featured: checked } : p
         )
       );
       toast.success(`Đã ${checked ? 'đánh dấu' : 'bỏ'} nổi bật`);
