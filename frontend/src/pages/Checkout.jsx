@@ -60,17 +60,13 @@ const Checkout = () => {
     if (status === 'succeeded' && currentOrder && !loading) {
       toast.success(`Bạn đã đặt hàng thành công! Đây là mã đơn hàng: ${currentOrder.order_code}`);
       dispatch(removeCartItemsAction(selectedItemIds));
+      dispatch(resetOrderAction())
       navigate('/');
     }
     if (status === 'failed' && error) {
       message.error(error);
     }
   }, [status, error, loading, currentOrder, dispatch, selectedItemIds, navigate]);
-
-  // Reset trạng thái order khi vào lại trang Checkout
-  useEffect(() => {
-    dispatch(resetOrderAction());
-  }, [dispatch]);
 
   useEffect(() => {
     if (user?._id) {

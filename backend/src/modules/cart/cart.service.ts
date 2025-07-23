@@ -4,13 +4,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CartItem, CartItemDocument } from './schemas/cart-item.schema';
 import { VariantProduct, VariantProductDocument } from '../product/schemas/product-variant.schema';
+import { Product, ProductDocument } from '../product/schemas/product.schema';
 
 @Injectable()
 export class CartService {
   constructor(
     @InjectModel(Cart.name) private cartModel: Model<CartDocument>,
     @InjectModel(CartItem.name) private cartItemModel: Model<CartItemDocument>,
-    @InjectModel(VariantProduct.name) private variantModel: Model<VariantProductDocument>
+    @InjectModel(VariantProduct.name) private variantModel: Model<VariantProductDocument>,
+    @InjectModel(Product.name) private productModel: Model<ProductDocument>
   ){}
 
   async createCart(userId: string): Promise<string> {
@@ -88,16 +90,16 @@ export class CartService {
   }
 
   async updateCartItemVariant(cartItemId: string, variantData: { color: string; dimensions: string }): Promise<CartItem | null> {
-    // Get the cart item and ensure it exists
     const cartItem = await this.cartItemModel.findById(cartItemId).populate('product_id').exec();
     if (!cartItem) {
       throw new NotFoundException('Không tìm thấy mục trong giỏ hàng');
     }
-
-    // Use the correct product ID for the variant lookup
+    if (!cartItem.product_id) {
+      throw new NotFoundException('Không tìm thấy sản phẩm liên kết với mục giỏ hàng');
+    }
+    // Lấy product_id từ cartItem, nếu là ObjectId thì lấy _id, nếu là string thì giữ nguyên
     const productId = (cartItem.product_id && (cartItem.product_id as any)._id) ? (cartItem.product_id as any)._id : cartItem.product_id;
 
-    // Find the variant that matches the color and dimensions for this product
     const variant = await this.variantModel.findOne({
       product_id: productId,
       color: variantData.color,
@@ -108,15 +110,14 @@ export class CartService {
       throw new NotFoundException('Không tìm thấy biến thể sản phẩm phù hợp');
     }
 
-    // Check for duplicate cart item with same product and new variant
     const duplicateItem = await this.cartItemModel.findOne({
       cart_id: cartItem.cart_id,
       product_id: productId,
       variant_id: variant._id
     }).exec();
 
+    // Kiểm tra nếu đã có cart item khác cùng product_id và variant_id thì gộp quantity
     if (duplicateItem && duplicateItem._id.toString() !== cartItemId) {
-      // Merge quantities and remove the old item
       duplicateItem.quantity += cartItem.quantity;
       await duplicateItem.save();
       await this.cartItemModel.findByIdAndDelete(cartItemId).exec();
@@ -129,8 +130,7 @@ export class CartService {
         })
         .exec();
     }
-
-    // Update the cart item with the new variant_id
+    // Cập nhật variant_id mới
     const updatedItem = await this.cartItemModel.findByIdAndUpdate(
       cartItemId,
       { variant_id: variant._id },
@@ -152,14 +152,46 @@ export class CartService {
   }
 
   async removeCartItem(cartItemId: string): Promise<void> {
+    const cartItem = await this.cartItemModel.findById(cartItemId).exec();
+    if (!cartItem) {
+      throw new NotFoundException('Không tìm thấy mục trong giỏ hàng');
+    }
+    
+    //Tăng lại quantity cho product và product variant nếu có
+    if (cartItem.variant_id) {
+      await this.variantModel.findByIdAndUpdate(cartItem.variant_id, {
+        $inc: { quantity: cartItem.quantity }
+      }).exec();
+    } else {
+      await this.productModel.findByIdAndUpdate(cartItem.product_id, {
+        $inc: { stock_quantity: cartItem.quantity }
+      }).exec();
+    }
     await this.cartItemModel.findByIdAndDelete(cartItemId).exec();
   }
 
   async clearCartItems(cartId: string): Promise<void> {
+    const cart = await this.cartModel.findById(cartId).exec();
+    if (!cart) {
+      throw new NotFoundException('Không tìm thấy giỏ hàng');
+    }
     await this.cartItemModel.deleteMany({ cart_id: cartId }).exec();
   }
 
   async removeCartItems(cartItemIds: string[]): Promise<void> {
+     // Tăng lại quantity cho tất cả các sản phẩm trong giỏ hàng
+    const cartItems = await this.cartItemModel.find({ _id: { $in: cartItemIds } }).exec();
+    for (const item of cartItems) {
+      if (item.variant_id) {
+        await this.variantModel.findByIdAndUpdate(item.variant_id, {
+          $inc: { quantity: item.quantity }
+        }).exec();
+      } else {
+        await this.productModel.findByIdAndUpdate(item.product_id, {
+          $inc: { stock_quantity: item.quantity }
+        }).exec();
+      }
+    }
     await this.cartItemModel.deleteMany({ _id: { $in: cartItemIds } }).exec();
   }
 

@@ -38,32 +38,32 @@ export class CartController {
   }
 
   @Get('/cart-item')
-  async getCartItems(@Query('cartId') cartId: string, @Request() req) {
+  async getCartItems(@Query('cartId') cartId: string) {
     return this.cartService.getCartItems(cartId);
   }
 
   @Put('/cart-item/:id/variant')
-  async updateCartItemVariant(@Param('id') id: string, @Body() body: { variant_id: string }, @Request() req) {
+  async updateCartItemVariant(@Param('id') id: string, @Body() body: { variant_id: string }) {
     return this.cartService.updateCartItemVariantById(id, body.variant_id);
   }
 
   @Put('/cart-item/:id')
-  async updateCartItem(@Param('id') id: string, @Body() updateData: any, @Request() req) {
+  async updateCartItem(@Param('id') id: string, @Body() updateData: any) {
     return this.cartService.updateCartItem(id, updateData);
   }
 
   @Delete('/cart-item/batch')
-  async removeCartItems(@Body() body: { cartItemIds: string[] }, @Request() req) {
+  async removeCartItems(@Body() body: { cartItemIds: string[] }) {
     return this.cartService.removeCartItems(body.cartItemIds);
   }
 
   @Delete('/cart-item/:id')
-  async removeCartItem(@Param('id') id: string, @Request() req) {
+  async removeCartItem(@Param('id') id: string) {
     return this.cartService.removeCartItem(id);
   }
 
   @Delete('/cart-item/clear')
-  async clearCartItems(@Query('cartId') cartId: string, @Request() req) {
+  async clearCartItems(@Query('cartId') cartId: string) {
     return this.cartService.clearCartItems(cartId);
   }
 }
