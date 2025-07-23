@@ -16,6 +16,7 @@ const AddProduct = ({ onAdd, open, onClose }) => {
     sold: 0,
     total_reviews: 0,
     category_id: '',
+    is_featured: false,
   });
   const [categories, setCategories] = useState([]);
   const [selectedImage, setSelectedImage] = useState("")
@@ -35,7 +36,7 @@ const AddProduct = ({ onAdd, open, onClose }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewProduct((prev) => ({ ...prev, [name]: value }));
+    setNewProduct((prev) => ({ ...prev, [name]: type=== 'checkbox' ? checked : value }));
   };
 
   const handleImageChange = async (event) => {
@@ -155,6 +156,22 @@ const AddProduct = ({ onAdd, open, onClose }) => {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Đánh dấu nổi bật
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    name="is_featured"
+                    checked={newProduct.is_featured}
+                    onChange={handleInputChange}
+                    className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                  />
+                  <span className="text-gray-700 text-sm">Sản phẩm nổi bật</span>
+                </div>
               </div>
               
               <div className="md:col-span-2">

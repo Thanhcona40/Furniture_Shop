@@ -11,6 +11,7 @@ export class Product{
   @Prop() thumbnail_url: string;
   @Prop() sold: number;
   @Prop() total_reviews: number;
+  @Prop() is_featured: boolean;
   @Prop({ type: Types.ObjectId, ref: 'Category' }) category_id: Category;
   @Prop({ type: [{ type: String, ref: 'VariantProduct' }], default: [] }) // Mảng _id của VariantProduct
   variants: string[];

@@ -160,4 +160,11 @@ export class ProductService {
 
     return products;
   }
+
+  async updateMissingFeaturedField() {
+  return this.productModel.updateMany(
+    { is_featured: { $exists: false } },
+    { $set: { is_featured: false } }
+  );
+}
 }

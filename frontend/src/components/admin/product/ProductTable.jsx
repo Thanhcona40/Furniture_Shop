@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import AddVariantForm from './AddVariantForm';
-import { deleteVariant, getProducts } from '../../../api/product'; 
+import { deleteVariant, getProducts, toggleFeaturedProduct } from '../../../api/product'; 
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
@@ -29,6 +29,20 @@ const ProductTable = ({ products, setProducts, onDelete, onGetAll, onEditModal }
       setLoading(false);
     }
   }, [products, onGetAll]);
+
+  const handleFeaturedToggle = async (productId, checked) => {
+    try {
+      await toggleFeaturedProduct(productId, checked);
+      setProducts((prev) =>
+        prev.map((p) =>
+          p._id === product._id ? { ...p, is_featured: checked } : p
+        )
+      );
+      toast.success(`Đã ${checked ? 'đánh dấu' : 'bỏ'} nổi bật`);
+    } catch (err) {
+      toast.error('Cập nhật nổi bật thất bại');
+    }
+  };
 
   if (loading) return <div>Loading...</div>;
 
@@ -87,6 +101,9 @@ const ProductTable = ({ products, setProducts, onDelete, onGetAll, onEditModal }
             </th>
             <th scope="col" className="px-4 py-2 text-right text-sm font-bold text-gray-700 uppercase tracking-tighter whitespace-nowrap">
               Thêm biến thể
+            </th>
+            <th scope="col" className="px-4 py-2 text-left text-sm font-bold text-gray-700 uppercase tracking-tighter">
+              Nổi bật
             </th>
           </tr>
         </thead>
@@ -184,6 +201,13 @@ const ProductTable = ({ products, setProducts, onDelete, onGetAll, onEditModal }
                 >
                   <AddCircleOutlineOutlinedIcon className="w-5 h-5" />
                 </button>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <input
+                  type="checkbox"
+                  checked={product.is_featured || false}
+                  onChange={(e) => handleFeaturedToggle(product._id, e.target.checked)}
+                />
               </td>
             </tr>
           ))}

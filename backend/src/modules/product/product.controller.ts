@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Query, Patch } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -66,5 +66,15 @@ export class ProductController {
   @Roles(Role.Admin)
   async removeVariant(@Param('variantId') variantId: string) {
     return this.productsService.removeVariant(variantId);
+  }
+
+  @Patch('/fix-featured')
+  async fixFeaturedField() {
+    return this.productsService.updateMissingFeaturedField();
+  }
+
+  @Patch('/:id/featured')
+  async toggleFeatured(@Param('id') id: string, @Body() body: { is_featured: boolean }) {
+    return this.productsService.update(id, { is_featured: body.is_featured });
   }
 }
