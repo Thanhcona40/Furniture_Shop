@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
+import { getHotProducts } from '../../api/product';
 
 const categories = [
     { label: 'Sofa', value: 'sofa' },
@@ -46,7 +47,7 @@ const HotProduct = () => {
                         {categories.map(cat => (
                             <button
                                 key={cat.value}
-                                className={`hover:text-primary focus:outline-none ${selectedCategory === cat.value ? 'text-primary' : ''}`}
+                                className={`hover:text-primary focus:outline-none text-primary`}
                                 onClick={() => navigate(`/allproducts?category=${encodeURIComponent(cat.label)}`)}
                             >
                                 {cat.label}
