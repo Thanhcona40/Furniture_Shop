@@ -68,11 +68,6 @@ export class ProductController {
     return this.productsService.removeVariant(variantId);
   }
 
-  @Patch('/:id/featured')
-  async toggleFeatured(@Param('id') id: string, @Body() body: { is_featured: boolean }) {
-    return this.productsService.update(id, { is_featured: body.is_featured });
-  }
-
   @Get('featured')
   async getFeaturedProducts() {
     return this.productsService.getFeaturedProducts();
@@ -86,5 +81,10 @@ export class ProductController {
   @Get('new')
   async getNewProducts() {  
     return this.productsService.getNewProducts();
+  }
+
+  @Patch('/:id/featured')
+  async toggleFeatured(@Param('id') id: string, @Body() body: { is_featured: boolean }) {
+    return this.productsService.update(id, { is_featured: body.is_featured });
   }
 }
