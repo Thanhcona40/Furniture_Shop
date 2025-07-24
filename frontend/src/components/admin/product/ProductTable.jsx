@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import AddVariantForm from './AddVariantForm';
-import { deleteVariant, getProducts, toggleFeaturedProduct } from '../../../api/product'; 
+import { deleteVariant, getProducts } from '../../../api/product'; 
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
@@ -32,7 +32,6 @@ const ProductTable = ({ products, setProducts, onDelete, onGetAll, onEditModal }
 
   const handleFeaturedToggle = async (productId, checked) => {
     try {
-      await toggleFeaturedProduct(productId, checked);
       setProducts((prev) =>
         prev.map((p) =>
           p._id === productId ? { ...p, is_featured: checked } : p
