@@ -20,11 +20,6 @@ export class ProductController {
     return this.productsService.search(query);
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.productsService.findOne(id);
-  }
-
   // Admin APIs - cần đăng nhập và role admin
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -86,5 +81,10 @@ export class ProductController {
   @Patch('/:id/featured')
   async toggleFeatured(@Param('id') id: string, @Body() body: { is_featured: boolean }) {
     return this.productsService.update(id, { is_featured: body.is_featured });
+  }
+  
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.productsService.findOne(id);
   }
 }
