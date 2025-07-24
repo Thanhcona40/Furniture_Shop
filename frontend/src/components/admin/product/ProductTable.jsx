@@ -207,6 +207,8 @@ const ProductTable = ({ products, setProducts, onDelete, onGetAll, onEditModal }
                   type="checkbox"
                   checked={product.is_featured || false}
                   onChange={(e) => handleFeaturedToggle(product._id, e.target.checked)}
+                  className="h-5 w-5 text-primary focus:ring-primary"
+                  title="Đánh dấu nổi bật"
                 />
               </td>
             </tr>
