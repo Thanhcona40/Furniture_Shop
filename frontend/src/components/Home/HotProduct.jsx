@@ -47,14 +47,14 @@ const HotProduct = () => {
                         {categories.map(cat => (
                             <button
                                 key={cat.value}
-                                className={`hover:text-primary focus:outline-none text-primary`}
+                                className={`hover:text-primary focus:outline-none`}
                                 onClick={() => navigate(`/allproducts?category=${encodeURIComponent(cat.label)}`)}
                             >
                                 {cat.label}
                             </button>
                         ))}
                         <button
-                            className={`hover:text-primary focus:outline-none ${selectedCategory === 'all' ? 'text-primary' : ''}`}
+                            className={`hover:text-primary focus:outline-none`}
                             onClick={() => navigate('/allproducts')}
                         >
                             Xem tất cả
