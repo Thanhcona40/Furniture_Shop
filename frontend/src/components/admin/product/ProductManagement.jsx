@@ -12,6 +12,7 @@ const ProductManagement = () => {
   const [editProductModal, setEditProductModal] = useState(false);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const handleOpenAddModal = () => setAddProductModal(true);
   const handleCloseAddModal = () => setAddProductModal(false);
@@ -35,12 +36,7 @@ const ProductManagement = () => {
 
   const handleEdit = (selectProduct) => {
     setSelectedProduct(selectProduct);
-    // Không cần useEffect riêng, mở modal ngay
     handleOpenEditModal();
-  };
-
-  const handleGetAllProduct = (products) => {
-    setProducts(products);
   };
 
   const handleSave = (updatedProduct) => {
@@ -54,9 +50,11 @@ const ProductManagement = () => {
     const fetchProducts = async () => {
       try {
         const response = await getProducts();
-        handleGetAllProduct(response.data);
+        setProducts(response.data);
       } catch (err) {
         toast.error(err?.response?.data?.message);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProducts();
@@ -82,6 +80,7 @@ const ProductManagement = () => {
           onDelete={handleDelete}
           onGetAll={handleGetAllProduct}
           onEditModal={handleEdit}
+          loading={loading}
         />
       </div>
 

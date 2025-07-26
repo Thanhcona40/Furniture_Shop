@@ -25,7 +25,12 @@ const SimpleConfirmDialog = ({
       <DialogActions>
         <Button onClick={onClose} disabled={loading}>{cancelText}</Button>
         <Button onClick={onConfirm} color="primary" variant="contained" disabled={loading}>
-          {loading ? <><CircularProgress size={16} sx={{mr:1}} /> Đang xử lý...</> : confirmText}
+          {loading ? 
+            <>
+              <CircularProgress size={16} sx={{mr:1}} /> 
+              Đang xử lý...
+            </> : confirmText
+          }
         </Button>
       </DialogActions>
     </Dialog>

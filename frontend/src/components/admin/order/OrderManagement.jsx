@@ -11,7 +11,7 @@ import OrderFilterBar from './OrderFilterBar';
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderTrack, setOrderTrack] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -28,7 +28,6 @@ const OrderManagement = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      setLoading(true);
       try {
         const data = await getAllOrders(status);
         setOrders(data);

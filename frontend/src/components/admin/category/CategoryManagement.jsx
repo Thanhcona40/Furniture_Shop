@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { deleteCategory } from '../../../api/category';
+import { deleteCategory, getCategories } from '../../../api/category';
 import CategoryTable from './CategoryTable';
 import EditCategory from './EditCategory';
 import AddCategory from './AddCategory';
@@ -12,6 +12,7 @@ const CategoryManagement = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleOpenAddModal = () => setOpenAddModal(true);
   const handleCloseAddModal = () => setOpenAddModal(false);
@@ -20,6 +21,20 @@ const CategoryManagement = () => {
     setOpenEditModal(false);
     setSelectedCategory(null);
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategories();
+        setCategories(response.data);
+      } catch (err) {
+        toast.error(err?.response?.data?.message || 'Lỗi tải danh mục');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleAdd = (newCategory) => {
     setCategories((prev) => [...prev, newCategory]);
@@ -31,14 +46,9 @@ const CategoryManagement = () => {
     handleOpenEditModal();
   };
 
-  const handleGetCategories = (data) => {
-    setCategories(data);
-  };
-
   const handleSaveCategory = (updatedCategory) => {
     setCategories(categories.map(c => c._id === updatedCategory._id ? updatedCategory : c));
     toast.success('Cập nhật danh mục thành công!');
-    handleCloseEditModal();
   };
 
   const handleDeleteCategory = async (categoryId) => {
@@ -68,8 +78,8 @@ const CategoryManagement = () => {
         <CategoryTable 
           categories={categories} 
           onEdit={handleEditCategory}
-          onGetAll={handleGetCategories} 
           onDelete={handleDeleteCategory}
+          loading={loading}
         />
       </div>
 

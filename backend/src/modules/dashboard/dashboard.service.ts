@@ -29,7 +29,7 @@ export class DashboardService {
     const users = await this.userService.getAllUsers();
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);//lấy ngày cuối tháng
     const newCustomers = users.filter((user: any) => {
       const createdAt = user.createdAt ? new Date(user.createdAt) : null;
       return createdAt && createdAt >= startOfMonth && createdAt <= endOfMonth;
@@ -142,8 +142,7 @@ export class DashboardService {
       });
       return chartData;
     } else {
-      // Nếu không có month, trả về dữ liệu từng ngày của cả năm (hoặc từng tháng nếu muốn)
-      // Ở đây trả về từng ngày của cả năm (có thể sửa thành từng tháng nếu muốn)
+      // Nếu không có month, trả về dữ liệu từng ngày của cả năm 
       const chartData: Array<{date: string, revenue: number, orders: number}> = [];
       for (let m = 0; m < 12; m++) {
         const daysInMonth = new Date(y, m + 1, 0).getDate();
@@ -153,7 +152,9 @@ export class DashboardService {
         }
       }
       const orders = await this.orderService.getAllOrders();
-      orders.forEach((order: any) => {
+      const ordersDelivered = orders.filter(order => order.status === 'delivered'); // Chỉ tính đơn hàng đã giao
+      if (ordersDelivered.length === 0) return chartData; // Không có đơn hàng
+      ordersDelivered.forEach((order: any) => {
         if (!order.createdAt) return;
         const d = new Date(order.createdAt);
         if (d.getFullYear() === y) {

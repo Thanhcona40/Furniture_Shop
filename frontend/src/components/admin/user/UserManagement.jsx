@@ -12,7 +12,7 @@ const UserManagement = () => {
   const [error, setError] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(true);
   const [orderCounts, setOrderCounts] = useState({});
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [orderModalUser, setOrderModalUser] = useState(null);
@@ -53,7 +53,6 @@ const UserManagement = () => {
 
   const handleDeleteUser = async () => {
     if (!selectedUserId) return;
-    setActionLoading(true);
     try {
       await deleteUser(selectedUserId);
       setUsers(users.filter(u => u._id !== selectedUserId));

@@ -4,6 +4,7 @@ import RecentOrdersTable from './RecentOrdersTable';
 import BestSellingProductsTable from './BestSellingProductsTable';
 import StatCard from './StatCard';
 import DashboardChart from './DashboardChart';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const Dashboard = () => {
   const [summary, setSummary] = useState(null);
@@ -23,7 +24,7 @@ const Dashboard = () => {
     fetchSummary();
   }, []);
 
-  if (loading) return <div className="p-6 ml-64">Đang tải dữ liệu...</div>;
+  if (loading) return  <div className="flex justify-center items-center h-screen"><CircularProgress /></div>;
   if (!summary) return <div className="p-6 ml-64">Không thể tải dữ liệu dashboard.</div>;
 
   return (

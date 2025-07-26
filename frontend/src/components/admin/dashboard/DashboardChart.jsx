@@ -6,6 +6,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import { CircularProgress } from '@mui/material';
 
 const MONTHS = [
   'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
@@ -148,7 +149,7 @@ const DashboardChart = () => {
         )}
       </div>
       {chartLoading ? (
-        <div>Đang tải biểu đồ...</div>
+        <CircularProgress className="mx-auto" size={24} />
       ) : (
         <LineChart
           height={350}
