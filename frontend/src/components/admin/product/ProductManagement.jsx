@@ -78,7 +78,6 @@ const ProductManagement = () => {
           products={products}
           setProducts={setProducts}
           onDelete={handleDelete}
-          onGetAll={handleGetAllProduct}
           onEditModal={handleEdit}
           loading={loading}
         />

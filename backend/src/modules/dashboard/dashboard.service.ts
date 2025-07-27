@@ -130,7 +130,8 @@ export class DashboardService {
         chartData.push({ date: dateStr, revenue: 0, orders: 0 });
       }
       const orders = await this.orderService.getAllOrders();
-      orders.forEach((order: any) => {
+      const ordersDelivered = orders.filter(order => order.status === 'delivered'); // Chỉ tính đơn hàng đã giao
+      ordersDelivered.forEach((order: any) => {
         if (!order.createdAt) return;
         const d = new Date(order.createdAt);
         if (d.getFullYear() === y && d.getMonth() === m) {

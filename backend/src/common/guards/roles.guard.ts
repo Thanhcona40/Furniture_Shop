@@ -8,7 +8,7 @@ export class RolesGuard implements CanActivate {
               private jwtService: JwtService) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+    const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler()); // lấy roles từ metadata
     if (!requiredRoles) return true;
 
     const request = context.switchToHttp().getRequest();

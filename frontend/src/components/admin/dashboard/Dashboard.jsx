@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDashboardSummary, getDashboardChartData } from '../../../api/dashboard';
+import { getDashboardSummary } from '../../../api/dashboard';
 import RecentOrdersTable from './RecentOrdersTable';
 import BestSellingProductsTable from './BestSellingProductsTable';
 import StatCard from './StatCard';
