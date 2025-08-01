@@ -62,7 +62,7 @@ export class WebsocketService {
     if (admin) {
       // Gửi realtime + lưu DB cho admin
       if (this.server) {
-        this.server.to(`user_${admin._id}`).emit('admin-notification', notification);
+        this.server.to(`admin-room`).emit('admin-notification', notification);
       }
       await this.notificationService.createNotification({
         ...notification,

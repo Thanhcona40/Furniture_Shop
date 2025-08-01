@@ -49,6 +49,7 @@ const ProductManagement = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
         const response = await getProducts();
         setProducts(response.data);
       } catch (err) {

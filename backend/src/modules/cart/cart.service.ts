@@ -206,7 +206,7 @@ export class CartService {
       product_id: cartItem.product_id,
       variant_id: variantId
     }).exec();
-
+    
     if (duplicateItem && duplicateItem._id.toString() !== cartItemId) {
       duplicateItem.quantity += cartItem.quantity;
       await duplicateItem.save();

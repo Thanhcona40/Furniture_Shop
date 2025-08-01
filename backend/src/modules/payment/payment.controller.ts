@@ -2,13 +2,11 @@ import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { vnpayConfig } from './vnpay.config';
 import * as crypto from 'crypto';
-import { OrderService } from '../order/order.service';
 
 @Controller('payment')
 export class PaymentController {
   constructor(
     private readonly paymentService: PaymentService,
-    private readonly orderService: OrderService,
   ) {}
 
   @Post('create-vnpay-url')

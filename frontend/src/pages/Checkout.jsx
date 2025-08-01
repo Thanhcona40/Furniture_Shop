@@ -47,14 +47,6 @@ const Checkout = () => {
     }
   }, [selectedCartItems, navigate]);
 
-  // Kiểm tra đăng nhập
-  useEffect(() => {
-    if (!user) {
-      message.error('Bạn cần đăng nhập để thanh toán!');
-      navigate('/login');
-    }
-  }, [user, navigate]);
-
   useEffect(() => {
     if (user?._id) {
       getDefaultAddress()
@@ -102,7 +94,6 @@ const Checkout = () => {
       };
 
       if (paymentMethod === 'cod') {
-        await dispatch(createOrderAction(orderData)).unwrap();
         const order = await dispatch(createOrderAction(orderData)).unwrap();
         if (order && order._id) {
           toast.success(`Bạn đã đặt hàng thành công! Mã đơn: ${order.order_code}`);

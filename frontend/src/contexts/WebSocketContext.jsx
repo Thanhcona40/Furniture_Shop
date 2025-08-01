@@ -61,13 +61,11 @@ export const WebSocketProvider = ({ children }) => {
 
       newSocket.on('connect', () => {
         setIsConnected(true);
-        if (user?.role === 'admin') {
-          newSocket.emit('join-admin-room');
-        }
       });
       newSocket.on('disconnect', () => {
         setIsConnected(false);
       });
+      //cổng này sẽ nhận thông báo từ server
       newSocket.on('notification', (notification) => {
         setNotifications(prev => [notification, ...prev]);
         setUnreadCount(prev => prev + 1);
@@ -78,6 +76,7 @@ export const WebSocketProvider = ({ children }) => {
           });
         }
       });
+      //cổng này sẽ nhận thông báo từ server dành cho admin
       newSocket.on('admin-notification', (notification) => {
         setNotifications(prev => [notification, ...prev]);
         setUnreadCount(prev => prev + 1);

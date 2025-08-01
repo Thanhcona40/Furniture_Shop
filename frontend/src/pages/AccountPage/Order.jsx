@@ -62,7 +62,6 @@ const Order = () => {
         [order._id]: [detail, ward, district, province].filter(Boolean).join(', ')
       }));
     });
-    // eslint-disable-next-line
   }, [orders]);
 
   const getPaymentText = (order) => {

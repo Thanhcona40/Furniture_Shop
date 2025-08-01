@@ -25,16 +25,19 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
         console.log('Token:', token);
         const user = await this.websocketService.validateToken(token);
         if (user) {
-          // Lưu thông tin user vào socket
           client.data.user = user;
-          
-          // Join room theo user ID để nhận thông báo cá nhân
-          await client.join(`user_${user.user_id}`);
-          
-          console.log(`User ${user.user_id} connected to websocket`);
+          if (user.role === 'admin') {
+            // Chỉ join room admin-room nếu là admin
+            await client.join('admin-room');
+            console.log('Admin joined admin room');
+          } else {
+            // User thường join room cá nhân
+            await client.join(`user_${user.user_id}`);
+            console.log(`User ${user.user_id} connected to websocket`);
+          }
         } else {
-          client.disconnect();
-        }
+        client.disconnect();
+      }
       } else {
         // Cho phép kết nối không xác thực (cho admin)
         console.log('Anonymous user connected to websocket');
@@ -56,13 +59,6 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
     } else {
       console.log('Anonymous user disconnected from websocket');
     }
-  }
-
-  @SubscribeMessage('join-admin-room')
-  @UseGuards(AuthGuard('jwt'))
-  handleJoinAdminRoom(client: Socket) {
-    client.join('admin-room');
-    console.log('Admin joined admin room');
   }
 
   @SubscribeMessage('leave-admin-room')
