@@ -60,67 +60,30 @@ const DashboardChart = () => {
     }
   };
 
-  // Xử lý dữ liệu cho biểu đồ
-  let series = [];
-  let xAxis = [];
-  let displayData = chartData;
-  if (viewMode === 'year') {
-    // Tổng hợp dữ liệu từng ngày thành 12 tháng
-    const monthlyData = Array.from({ length: 12 }, (_, i) => ({ revenue: 0, orders: 0 }));
-    chartData.forEach(d => {
-      const month = new Date(d.date).getMonth(); // 0-based
-      monthlyData[month].revenue += d.revenue;
-      monthlyData[month].orders += d.orders;
-    });
-    displayData = monthlyData;
-  }
-  if (viewMode === 'month') {
-    // Giữ nguyên từng ngày
-    displayData = chartData;
-  }
-  if (viewMode === 'month') {
-    series = [
-      {
-        data: displayData.map(d => d.revenue),
-        label: 'Doanh thu (VND)',
-        yAxisKey: 'left',
-        color: '#1976d2',
-      },
-      {
-        data: displayData.map(d => d.orders),
-        label: 'Số lượng đơn',
-        yAxisKey: 'right',
-        color: '#ff9800',
-      },
-    ];
-    xAxis = [{
-      scaleType: 'point',
-      data: displayData.map(d => d.date.slice(-2)),
-      label: 'Ngày',
-    }];
-  } else {
-    // viewMode === 'year', mỗi điểm là 1 tháng
-    series = [
-      {
-        data: displayData.map(d => d.revenue),
-        label: 'Doanh thu (VND)',
-        yAxisKey: 'left',
-        color: '#1976d2',
-      },
-      {
-        data: displayData.map(d => d.orders),
-        label: 'Số lượng đơn',
-        yAxisKey: 'right',
-        color: '#ff9800',
-      },
-    ];
-    xAxis = [{
-      scaleType: 'point',
-      data: MONTHS,
-      label: 'Tháng',
-    }];
-  }
+  /// Xử lý dữ liệu cho biểu đồ
+  const series = [
+    {
+      data: chartData.map(d => d.revenue),
+      label: 'Doanh thu (VND)',
+      yAxisKey: 'left',
+      color: '#1976d2',
+    },
+    {
+      data: chartData.map(d => d.orders),
+      label: 'Số lượng đơn',
+      yAxisKey: 'right',
+      color: '#ff9800',
+    },
+  ];
 
+  const xAxis = [{
+    scaleType: 'point',
+    data: viewMode === 'month'
+      ? chartData.map(d => d.date.slice(-2))
+      : MONTHS,
+    label: viewMode === 'month' ? 'Ngày' : 'Tháng',
+  }];
+  
   return (
     <div className="bg-white rounded shadow p-4 mb-8">
       <div className="flex items-center justify-between mb-2">

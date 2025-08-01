@@ -143,33 +143,25 @@ export class DashboardService {
       });
       return chartData;
     } else {
-      // Nếu không có month, trả về dữ liệu từng ngày của cả năm 
+      // Trả về 12 phần tử, mỗi phần tử là tổng hợp của 1 tháng
       const chartData: Array<{date: string, revenue: number, orders: number}> = [];
+      // Khởi tạo 12 tháng
       for (let m = 0; m < 12; m++) {
-        const daysInMonth = new Date(y, m + 1, 0).getDate();
-        for (let day = 1; day <= daysInMonth; day++) {
-          const dateStr = `${y}-${(m + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-          chartData.push({ date: dateStr, revenue: 0, orders: 0 });
-        }
+        chartData.push({
+          date: `${y}-${(m + 1).toString().padStart(2, '0')}`,
+          revenue: 0,
+          orders: 0,
+        });
       }
       const orders = await this.orderService.getAllOrders();
-      const ordersDelivered = orders.filter(order => order.status === 'delivered'); // Chỉ tính đơn hàng đã giao
-      if (ordersDelivered.length === 0) return chartData; // Không có đơn hàng
+      const ordersDelivered = orders.filter(order => order.status === 'delivered');
       ordersDelivered.forEach((order: any) => {
         if (!order.createdAt) return;
         const d = new Date(order.createdAt);
         if (d.getFullYear() === y) {
-          const m = d.getMonth();
-          const day = d.getDate();
-          // Tìm index
-          const idx = chartData.findIndex(item => {
-            const [yy, mm, dd] = item.date.split('-');
-            return parseInt(yy) === y && parseInt(mm) === m + 1 && parseInt(dd) === day;
-          });
-          if (idx !== -1) {
-            chartData[idx].revenue += order.total || 0;
-            chartData[idx].orders += 1;
-          }
+          const m = d.getMonth(); // 0-based
+          chartData[m].revenue += order.total || 0;
+          chartData[m].orders += 1;
         }
       });
       return chartData;
