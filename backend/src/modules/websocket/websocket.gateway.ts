@@ -1,8 +1,6 @@
 import {WebSocketGateway,WebSocketServer, SubscribeMessage,OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { UseGuards } from '@nestjs/common';
 import { WebsocketService } from './websocket.service';
-import { AuthGuard } from '@nestjs/passport';
 
 @WebSocketGateway({
   cors: {
