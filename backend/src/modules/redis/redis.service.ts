@@ -11,9 +11,9 @@ export class RedisService implements OnModuleInit {
     }
 
     async onModuleInit() {
-        this.client = createClient({ url: this.configService.get<string>('REDIS_URL') });
-        this.client.on('error', (err) => console.error('Redis Client Error', err));
-        await this.client.connect();
+        // this.client = createClient({ url: this.configService.get<string>('REDIS_URL') });
+        // this.client.on('error', (err) => console.error('Redis Client Error', err));
+        // await this.client.connect();
     }
 
     getClient(): RedisClientType {
