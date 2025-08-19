@@ -15,25 +15,25 @@ export class CategoryService {
     }
 
     async findAll(): Promise<Category[]> {
-        const cacheKey = 'categories:all';
-        const redis = this.redisService.getClient();
-        let cached: any;
-        try{
-            cached = await redis.get(cacheKey);
-        } catch (err) {
-            console.warn('Redis GET error:', err.message);
-        }
-        if (cached) {
-            console.log(`Cache HIT for ${cacheKey}`);
-            return JSON.parse(cached);
-        }
+        // const cacheKey = 'categories:all';
+        // const redis = this.redisService.getClient();
+        // let cached: any;
+        // try{
+        //     cached = await redis.get(cacheKey);
+        // } catch (err) {
+        //     console.warn('Redis GET error:', err.message);
+        // }
+        // if (cached) {
+        //     console.log(`Cache HIT for ${cacheKey}`);
+        //     return JSON.parse(cached);
+        // }
         const category  = await this.categoryModel.find().exec();
-        try {
-            await redis.setEx(cacheKey, 3600, JSON.stringify(category));
-            console.log(`Cache MISS –> Cache SET for ${cacheKey}`);
-        } catch (err) {
-            console.warn('Redis SET error:', err.message);
-        }
+        // try {
+        //     await redis.setEx(cacheKey, 3600, JSON.stringify(category));
+        //     console.log(`Cache MISS –> Cache SET for ${cacheKey}`);
+        // } catch (err) {
+        //     console.warn('Redis SET error:', err.message);
+        // }
 
         return category;
     }
