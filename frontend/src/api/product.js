@@ -1,6 +1,6 @@
 import { api } from "../config/api";
 
-export const getProducts = () => api.get('/products');
+export const getProducts = (params) => api.get('/products', {params});
 export const getProductById = (id) => api.get(`/products/${id}`)
 export const addProduct = (data) => api.post('/products', data);
 export const updateProduct = (id, data) => api.put(`/products/${id}`, data);

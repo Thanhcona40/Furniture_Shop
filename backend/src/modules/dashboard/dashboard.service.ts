@@ -36,34 +36,33 @@ export class DashboardService {
     }).length;
 
     // Lấy tất cả sản phẩm (đã populate variants)
-    const products = await this.productService.findAll();
-    // Tổng tồn kho dựa trên variant
+    // const products = await this.productService.findAll();
     let productsInStock = 0;
     const lowStockProducts: any[] = [];
     const outOfStockProducts: any[] = [];
     const LOW_STOCK_THRESHOLD = 5;
-    products.forEach((product: any) => {
-      let totalStock = 0;
-      if (product.variants && product.variants.length > 0) {
-        totalStock = product.variants.reduce((sum: number, variant: any) => sum + (variant.quantity || 0), 0);
-      } else {
-        totalStock = product.stock_quantity || 0;
-      }
-      productsInStock += totalStock;
-      if (totalStock === 0) {
-        outOfStockProducts.push({
-          name: product.name,
-          totalStock,
-          variants: (product.variants || []).map((v: any) => ({ name: v.color || v.dimensions || '', stock: v.quantity || 0 }))
-        });
-      } else if (totalStock <= LOW_STOCK_THRESHOLD) {
-        lowStockProducts.push({
-          name: product.name,
-          totalStock,
-          variants: (product.variants || []).map((v: any) => ({ name: v.color || v.dimensions || '', stock: v.quantity || 0 }))
-        });
-      }
-    });
+    // products.forEach((product: any) => {
+    //   let totalStock = 0;
+    //   if (product.variants && product.variants.length > 0) {
+    //     totalStock = product.variants.reduce((sum: number, variant: any) => sum + (variant.quantity || 0), 0);
+    //   } else {
+    //     totalStock = product.stock_quantity || 0;
+    //   }
+    //   productsInStock += totalStock;
+    //   if (totalStock === 0) {
+    //     outOfStockProducts.push({
+    //       name: product.name,
+    //       totalStock,
+    //       variants: (product.variants || []).map((v: any) => ({ name: v.color || v.dimensions || '', stock: v.quantity || 0 }))
+    //     });
+    //   } else if (totalStock <= LOW_STOCK_THRESHOLD) {
+    //     lowStockProducts.push({
+    //       name: product.name,
+    //       totalStock,
+    //       variants: (product.variants || []).map((v: any) => ({ name: v.color || v.dimensions || '', stock: v.quantity || 0 }))
+    //     });
+    //   }
+    // });
 
     // Sản phẩm bán chạy nhất (top 5 theo sold, tính theo variant nếu có)
     // Lấy tất cả order items

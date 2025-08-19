@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { PassportModule } from '@nestjs/passport';
 import { PaymentController } from './modules/payment/payment.controller';
 import { ProductModule } from './modules/product/product.module';
 import { UserModule } from './modules/user/user.module';
@@ -17,6 +16,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { WebsocketModule } from './modules/websocket/websocket.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { BlogModule } from './modules/blog/blog.module';
+import { RedisModule } from './modules/redis/redis.module';
 
 @Module({
   imports: [
@@ -42,11 +42,10 @@ import { BlogModule } from './modules/blog/blog.module';
     DashboardModule,
     WebsocketModule,
     NotificationModule,
-    BlogModule
+    BlogModule,
+    RedisModule
   ],
   controllers: [AppController, PaymentController],
-  providers: [
-    AppService
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -1,29 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  getUserAddresses, 
-  createUserAddress, 
-  updateUserAddress, 
-  deleteUserAddress, 
-  setDefaultAddress,
-  getProvinceNameById,
-  getDistrictNameById,
-  getWardNameById
-} from '../../api/address';
+import { getUserAddresses, createUserAddress, updateUserAddress, deleteUserAddress, setDefaultAddress } from '../../api/address';
 import AddressForm from '../../components/checkout/AddressForm';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button, 
-  Alert,
-  Snackbar,
-  Divider
-} from '@mui/material';
-import { 
-  LocationOn as LocationIcon
-} from '@mui/icons-material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button,Divider} from '@mui/material';
+import {  LocationOn as LocationIcon } from '@mui/icons-material';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import { toast } from 'react-toastify';
+import { formatAddress } from '../../utils/formatAddress';
 
 const AddressPage = () => {
   const [addresses, setAddresses] = useState([]);
@@ -31,52 +13,22 @@ const AddressPage = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
   const [formData, setFormData] = useState({});
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-  const [addressNames, setAddressNames] = useState({}); // {addressId: {province, district, ward}}
 
-  // Load danh sách địa chỉ
   const loadAddresses = async () => {
-    try {
-      setLoading(true);
-      const response = await getUserAddresses();
-      setAddresses(response.data);
-      // Lấy tên tỉnh/quận/xã cho từng address
-      if (response.data.length > 0) {
-        Promise.all(response.data.map(async (address) => {
-          const [province, district, ward] = await Promise.all([
-            getProvinceNameById(address.address.province_id).then(res => res.data.name),
-            getDistrictNameById(address.address.district_id).then(res => res.data.name),
-            getWardNameById(address.address.ward_id).then(res => res.data.name),
-          ]);
-          return { id: address._id, province, district, ward };
-        })).then(results => {
-          const namesMap = {};
-          results.forEach(r => {
-            namesMap[r.id] = { province: r.province, district: r.district, ward: r.ward };
-          });
-          setAddressNames(namesMap);
-        });
-      } else {
-        setAddressNames({});
+      try {
+        setLoading(true);
+        const response = await getUserAddresses();
+        setAddresses(response.data);
+      } catch (error) {
+        toast.error('Có lỗi xảy ra khi tải địa chỉ');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      showSnackbar('Có lỗi xảy ra khi tải danh sách địa chỉ', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
+  };  
 
   useEffect(() => {
     loadAddresses();
   }, []);
-
-  const showSnackbar = (message, severity = 'success') => {
-    setSnackbar({ open: true, message, severity });
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
 
   // Mở dialog thêm địa chỉ mới
   const handleAddAddress = () => {
@@ -96,10 +48,10 @@ const AddressPage = () => {
     if (window.confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) {
       try {
         await deleteUserAddress(addressId);
-        showSnackbar('Xóa địa chỉ thành công');
+        toast.success('Xóa địa chỉ thành công');
         loadAddresses();
       } catch (error) {
-        showSnackbar('Có lỗi xảy ra khi xóa địa chỉ', 'error');
+        toast.error('Có lỗi xảy ra khi xóa địa chỉ');
       }
     }
   };
@@ -108,11 +60,11 @@ const AddressPage = () => {
   const handleSetDefault = async (addressId) => {
     try {
       await setDefaultAddress(addressId);
-      showSnackbar('Đặt địa chỉ mặc định thành công');
+      toast.success('Đặt địa chỉ mặc định thành công');
       loadAddresses();
     } catch (error) {
       console.error('Error setting default address:', error);
-      showSnackbar('Có lỗi xảy ra khi đặt địa chỉ mặc định', 'error');
+      toast.error('Có lỗi xảy ra khi đặt địa chỉ mặc định');
     }
   };
 
@@ -121,25 +73,24 @@ const AddressPage = () => {
     // Validation cơ bản
     if (!formData.full_name || !formData.email || !formData.phone || !formData.detail || 
         !formData.province_id || !formData.district_id || !formData.ward_id) {
-      showSnackbar('Vui lòng điền đầy đủ thông tin', 'error');
+      toast.error('Vui lòng điền đầy đủ thông tin địa chỉ');
       return;
     }
-
     try {
       if (editingAddress) {
         // Cập nhật địa chỉ
         await updateUserAddress(editingAddress._id, formData);
-        showSnackbar('Cập nhật địa chỉ thành công');
+        toast.success('Cập nhật địa chỉ thành công');
       } else {
         // Thêm địa chỉ mới
         await createUserAddress(formData);
-        showSnackbar('Thêm địa chỉ thành công');
+        toast.success('Thêm địa chỉ thành công');
       }
       setOpenDialog(false);
       loadAddresses();
     } catch (error) {
       console.error('Error saving address:', error);
-      showSnackbar('Có lỗi xảy ra khi lưu địa chỉ', 'error');
+      toast.error('Có lỗi xảy ra khi lưu địa chỉ');
     }
   };
 
@@ -148,13 +99,6 @@ const AddressPage = () => {
     setOpenDialog(false);
     setEditingAddress(null);
     setFormData({});
-  };
-
-  // Format địa chỉ để hiển thị
-  const formatAddress = (address) => {
-    const names = addressNames[address._id];
-    if (!names) return address.address.detail;
-    return [address.address.detail, names.ward, names.district, names.province].filter(Boolean).join(', ');
   };
 
   if (loading) {
@@ -212,7 +156,7 @@ const AddressPage = () => {
                   <span className="font-medium">Email:</span> {address.email}
                 </div>
                 <div className="mb-1 text-gray-700">
-                  <span className="font-medium">Địa chỉ:</span> {formatAddress(address)}
+                  <span className="font-medium">Địa chỉ:</span> {formatAddress(address.address)}
                 </div>
               </div>
               <div className="flex flex-col gap-2 items-end min-w-[160px]">
@@ -276,22 +220,6 @@ const AddressPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Snackbar thông báo */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbar.severity}
-          className="w-full"
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };

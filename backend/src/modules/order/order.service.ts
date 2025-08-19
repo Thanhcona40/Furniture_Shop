@@ -145,6 +145,9 @@ export class OrderService {
           }
         ]
       })
+      .populate('shipping_address.province_id', 'name')
+      .populate('shipping_address.district_id', 'name')
+      .populate('shipping_address.ward_id', 'name')
       .sort({ createdAt: -1 });
   }
 
@@ -224,6 +227,9 @@ export class OrderService {
           }
         ]
       })
+      .populate('shipping_address.province_id', 'name')
+      .populate('shipping_address.district_id', 'name')
+      .populate('shipping_address.ward_id', 'name')
       .populate('user_id', 'full_name email phone')
       .sort({ createdAt: -1 });
   }

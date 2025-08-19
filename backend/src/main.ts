@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { UserService } from './modules/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { Role } from './common/enums/role.enum';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,8 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
+  app.use(helmet());
 
   const userService = app.get(UserService);
 

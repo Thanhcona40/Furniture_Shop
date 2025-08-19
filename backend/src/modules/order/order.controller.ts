@@ -17,7 +17,7 @@ export class OrderController {
   }
 
   @Get('user')
-  async getUserOrders(@Request() req, @Query('status') status?: string) {
+  async getUserOrders(@Request() req : any, @Query('status') status?: string) {
     return this.orderService.getUserOrders(req.user.user_id, status);
   }
 
@@ -49,7 +49,6 @@ export class OrderController {
   @Get(':id/track')
   async getOrderTrackUser(@Param('id') id: string, @Request() req) {
     const order = await this.orderService.getOrderById(id, req.user);
-    console.log("order là kiểu gì vậy",order);
     if (!order) throw new NotFoundException('Đơn hàng không tồn tại hoặc không thuộc về bạn');
     return this.orderService.getOrderTrackByOrderId(id);
   }

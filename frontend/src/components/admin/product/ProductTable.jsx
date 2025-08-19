@@ -90,7 +90,7 @@ const ProductTable = ({ products, setProducts, onDelete, onEditModal, loading })
           {loading ? (
             <div className="flex justify-center"><CircularProgress /></div>
           ) : (
-            products.map((product) => (
+            products?.map((product) => (
               <tr key={product._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 w-48">
                   <div className="font-medium text-gray-900">{product.name}</div>

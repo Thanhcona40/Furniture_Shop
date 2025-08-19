@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { message } from 'antd';
 import { Tabs, Tab } from '@mui/material';
 import { cancelOrderAction, fetchUserOrders } from '../../redux/actions/orderActions';
-import { getProvinceNameById, getDistrictNameById, getWardNameById } from '../../api/address';
 import { getOrderTrack } from '../../api/order';
 import { ORDER_STATUS_TABS } from '../../utils/orderConstants';
 import OrderTable from '../../components/order/OrderTable';
@@ -15,7 +14,6 @@ const Order = () => {
   const { orders, status: orderStatus, error } = useSelector((state) => state.order);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [addressCache, setAddressCache] = useState({});
   const [orderTrack, setOrderTrack] = useState([]);
   const [status, setStatus] = useState('all');
 
@@ -28,41 +26,6 @@ const Order = () => {
       message.error(error);
     }
   }, [error]);
-
-  // Khi orders thay đổi, lấy tên địa chỉ cho từng đơn
-  useEffect(() => {
-    if (!orders || orders.length === 0) return;
-    orders.forEach(async (order) => {
-      const { shipping_address } = order;
-      if (!shipping_address) return;
-      const detail = shipping_address.detail || '';
-      const provinceId = shipping_address.province_id;
-      const districtId = shipping_address.district_id;
-      const wardId = shipping_address.ward_id;
-      if (addressCache[order._id]) return;
-      let province = '';
-      let district = '';
-      let ward = '';
-      try {
-        if (provinceId) {
-          const res = await getProvinceNameById(provinceId);
-          province = res.data?.name || '';
-        }
-        if (districtId) {
-          const res = await getDistrictNameById(districtId);
-          district = res.data?.name || '';
-        }
-        if (wardId) {
-          const res = await getWardNameById(wardId);
-          ward = res.data?.name || '';
-        }
-      } catch {}
-      setAddressCache(prev => ({
-        ...prev,
-        [order._id]: [detail, ward, district, province].filter(Boolean).join(', ')
-      }));
-    });
-  }, [orders]);
 
   const getPaymentText = (order) => {
     if (order.payment_status) {
@@ -123,7 +86,6 @@ const Order = () => {
       ) : (
         <OrderTable
           orders={orders}
-          addressCache={addressCache}
           onShowDetail={handleShowDetail}
           onCancelOrder={handleCancelOrder}
           getStatusColor={(status) => statusColor[status] || 'default'}
@@ -135,7 +97,6 @@ const Order = () => {
         open={modalOpen}
         onClose={handleCloseModal}
         order={selectedOrder}
-        address={selectedOrder ? addressCache[selectedOrder._id] : ''}
         orderTrack={orderTrack}
       />
     </div>

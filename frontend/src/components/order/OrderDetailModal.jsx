@@ -3,7 +3,7 @@ import { Modal } from 'antd';
 import OrderProductList from './OrderProductList';
 import OrderDetailInfo from './OrderDetailInfo';
 
-const OrderDetailModal = ({ open, onClose, order, address, orderTrack = [] }) => {
+const OrderDetailModal = ({ open, onClose, order, orderTrack = [] }) => {
   if (!order) return null;
   return (
     <Modal
@@ -16,7 +16,6 @@ const OrderDetailModal = ({ open, onClose, order, address, orderTrack = [] }) =>
       <div>
         <OrderProductList items={order.items} />
         <OrderDetailInfo
-          address={address}
           shippingAddress={order.shipping_address}
           subtotal={order.subtotal}
           shippingFee={order.shipping_fee}

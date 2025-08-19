@@ -2,10 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category, CategoryDocument } from './category.schema';
 import { Model } from 'mongoose';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class CategoryService {
-    constructor(@InjectModel(Category.name) private categoryModel : Model<CategoryDocument> ){}
+    constructor(@InjectModel(Category.name) private categoryModel : Model<CategoryDocument>,
+                 private readonly redisService: RedisService){}
 
     async create(createCategoryDto: any): Promise<Category> {
         const createdCategory = new this.categoryModel(createCategoryDto);
@@ -13,7 +15,27 @@ export class CategoryService {
     }
 
     async findAll(): Promise<Category[]> {
-        return this.categoryModel.find().exec();
+        const cacheKey = 'categories:all';
+        const redis = this.redisService.getClient();
+        let cached: any;
+        try{
+            cached = await redis.get(cacheKey);
+        } catch (err) {
+            console.warn('Redis GET error:', err.message);
+        }
+        if (cached) {
+            console.log(`Cache HIT for ${cacheKey}`);
+            return JSON.parse(cached);
+        }
+        const category  = await this.categoryModel.find().exec();
+        try {
+            await redis.setEx(cacheKey, 3600, JSON.stringify(category));
+            console.log(`Cache MISS –> Cache SET for ${cacheKey}`);
+        } catch (err) {
+            console.warn('Redis SET error:', err.message);
+        }
+
+        return category;
     }
 
     async findOne(id: string): Promise<Category> {

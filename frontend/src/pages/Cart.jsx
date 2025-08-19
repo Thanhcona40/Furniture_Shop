@@ -35,7 +35,6 @@ const Cart = () => {
     return <div>Bạn cần đăng nhập để xem giỏ hàng.</div>;
   }
 
-  if (status === "loading") return <div className="flex justify-center"><CircularProgress /></div>;
   if (status === "failed") return <div>Lỗi khi tải giỏ hàng</div>;
 
   const handleAmountChange = (value, cartItemId) => {

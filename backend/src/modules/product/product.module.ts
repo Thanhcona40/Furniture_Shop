@@ -7,6 +7,7 @@ import { ProductReviewSchema } from './schemas/product-review.schema';
 import { VariantProductSchema } from './schemas/product-variant.schema';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { AuthModule } from '../auth/auth.module';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthModule } from '../auth/auth.module';
       {name: 'ProductReview', schema: ProductReviewSchema} 
     ]),
     AuthModule,
+    RedisModule
   ],
   providers: [ProductService, RolesGuard],
   controllers: [ProductController],

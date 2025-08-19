@@ -3,12 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductDocument } from './schemas/product.schema';
 import { VariantProduct, VariantProductDocument } from './schemas/product-variant.schema';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class ProductService {
+
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     @InjectModel(VariantProduct.name) private variantModel: Model<VariantProductDocument>,
+    private readonly redisService: RedisService
   ) {}
 
   async create(createProductDto: any): Promise<Product> {
@@ -20,14 +24,48 @@ export class ProductService {
     return createdProduct.save();
   }
 
-  async findAll(): Promise<Product[]> {
-    const products = await this.productModel
-      .find()
-      .populate('category_id', '_id name') // Chỉ lấy _id và name
-      .populate('variants')
-      .exec();
-    return products;
+  async findAll(paginationDto: PaginationDto): Promise<any> { 
+    const { page , limit } = paginationDto;
+    const skip = (page - 1) * limit;
+    const cacheKey = `products:page:${page}:limit:${limit}`;
+
+    const redis = this.redisService.getClient();
+    let cached : any;
+    try {
+      cached = await redis.get(cacheKey);
+    } catch (err) {
+      console.warn('Redis GET error:', err.message);
+    }
+
+    if (cached) {
+      console.log(`Cache HIT for ${cacheKey}`);
+      return JSON.parse(cached);
+    }
+
+    const [products, total] = await Promise.all([
+      this.productModel
+        .find()
+        .skip(skip)
+        .limit(limit)
+        .populate('category_id', '_id name')
+        .populate('variants')
+        .exec(),
+      this.productModel.countDocuments().exec(),     
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+    const dataToCache = { products, totalPages };
+
+    try {
+      await redis.setEx(cacheKey, 3600, JSON.stringify(dataToCache));
+      console.log(`Cache MISS –> Cache SET for ${cacheKey}`);
+    } catch (err) {
+      console.warn('Redis SET error:', err.message);
+    }
+
+    return dataToCache;
   }
+
 
   async findOne(id: string): Promise<Product> {
     const product = await this.productModel
@@ -130,7 +168,7 @@ export class ProductService {
 
   async search(keyword: string): Promise<Product[]> {
     if (!keyword || keyword.trim() === '') {
-      return this.findAll();
+      throw new NotFoundException('Không có từ khóa tìm kiếm');
     }
 
     const searchRegex = new RegExp(keyword, 'i'); // Case-insensitive search
@@ -162,15 +200,49 @@ export class ProductService {
   }
 
   async getFeaturedProducts(): Promise<Product[]> {
-    const featuredProducts = await this.productModel
+    const cacheKey = `products:featured`;
+    const redis = this.redisService.getClient();
+    let cached : any;
+    try {
+      cached = await redis.get(cacheKey);
+    } catch (err) {
+      console.warn('Redis GET error:', err.message);
+    }
+
+    if (cached) {
+      console.log(`Cache HIT for ${cacheKey}`);
+      return JSON.parse(cached);
+    }
+    
+    const featuredProducts = await this.productModel    
       .find({ is_featured: true })
       .populate('category_id', '_id name')
       .populate('variants')
       .exec();
+    try{
+      await redis.setEx(cacheKey, 3600, JSON.stringify(featuredProducts));
+      console.log(`Cache MISS –> Cache SET for ${cacheKey}`);
+    } catch (err){
+      console.warn("Redis SET error: ", err.message);
+    }
     return featuredProducts;
   }
 
   async getHotProducts(): Promise<Product[]> {
+    const cacheKey = 'products:hot';
+    const redis = this.redisService.getClient();
+    let cached: any;
+    try{
+      cached = await redis.get(cacheKey);
+    }
+    catch (err) {
+      console.warn('Redis GET error:', err.message);
+    }
+    if(cacheKey){
+      console.log(`Cache HIT for ${cacheKey}`);
+      return JSON.parse(cached);
+    }
+
     const hotProducts = await this.productModel
       .find()
       .sort({ sold: -1 }) // Sắp xếp theo số lượng đã bán giảm dần
@@ -178,10 +250,30 @@ export class ProductService {
       .populate('category_id', '_id name')
       .populate('variants')
       .exec();
+    try{
+      await redis.setEx(cacheKey, 3600, JSON.stringify(hotProducts))
+      console.log(`Cache MISS –> Cache SET for ${cacheKey}`);
+    } catch (err) {
+      console.warn('Redis SET error: ', err.message);
+    }
     return hotProducts;
   }
 
   async getNewProducts(): Promise<Product[]> {
+    const cacheKey = 'products:new';
+    const redis = this.redisService.getClient();
+    let cached : any;
+    try{
+      cached = await redis.get(cacheKey);
+      console.log(`Cache HIT for ${cacheKey}`);
+    } catch(err){
+      console.warn('Redis GET error:', err.message);
+    }
+    
+    if (cached){
+      return JSON.parse(cached);
+    }
+
     const newProducts = await this.productModel
       .find()
       .sort({ createdAt: -1 }) // Sắp xếp theo ngày tạo mới nhất
@@ -189,6 +281,13 @@ export class ProductService {
       .populate('category_id', '_id name')
       .populate('variants')
       .exec();
+
+    try{ 
+      await redis.setEx(cacheKey, 3600, JSON.stringify(newProducts));
+      console.log(`Cache MISS –> Cache SET for ${cacheKey}`);
+    } catch(err) {
+      console.warn('Redis SET error: ', err.message);
+    }
     return newProducts;
   }
 }

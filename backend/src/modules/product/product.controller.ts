@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('products')
 export class ProductController {
@@ -11,8 +12,10 @@ export class ProductController {
 
   // Public APIs - không cần guard
   @Get()
-  async findAll() {
-    return this.productsService.findAll();
+  async findAll(@Query() query: PaginationDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    return this.productsService.findAll({page, limit});
   }
 
   @Get('search')

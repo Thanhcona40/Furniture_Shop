@@ -52,7 +52,12 @@ export class AddressService {
 
   async getUserAddresses(userId: string) {
     // Trả về tất cả userAddress của user, chỉ gồm id và detail
-    return this.userAddressModel.find({ user_id: userId }).sort({ is_default: -1, createdAt: -1 });
+    return this.userAddressModel
+                  .find({ user_id: userId })
+                  .populate('address.province_id', 'name')
+                  .populate('address.district_id', 'name')
+                  .populate('address.ward_id', 'name')
+                  .sort({ is_default: -1, createdAt: -1 });
   }
 
   async createAddress(userId: string, createAddressDto: any) {

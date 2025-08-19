@@ -13,18 +13,21 @@ const ProductListPage = () => {
   const [filter, setFilter] = useState({ brands: [], prices: [] });
   const [page, setPage] = useState(1);
   const itemsPerPage = 12;
+  const [totalPages, setTotalPages] = useState(0);
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const category = params.get("category") || "Tất cả sản phẩm";
 
   useEffect(() => {
-    if (!products?.length) {
       const fetchProducts = async () => {
         try {
           setLoading(true);
-          const response = await getProducts();
-          setProducts(response.data);
+          const response = await getProducts({page: page, limit: itemsPerPage});
+          setProducts(response.data.products);
+          setTotalPages(response.data.totalPages);
+          console.log("Fetched Data", response.data);
+          console.log("Total Pages:", response.data.totalPages);
         } catch (err) {
           toast.error(err?.response?.data?.message);
         } finally {
@@ -32,8 +35,7 @@ const ProductListPage = () => {
         }
       };
       fetchProducts();
-    }
-  }, [products]);
+  }, [page]);
 
   // Reset về trang 1 khi filter hoặc category thay đổi
   useEffect(() => {
@@ -77,8 +79,6 @@ const ProductListPage = () => {
   };
 
   const filtered = filterProducts();
-  const paginatedProducts = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   const handlePageChange = (event, value) => {
     setPage(value);
@@ -99,8 +99,8 @@ const ProductListPage = () => {
         <div className="w-3/4">
           <h1 className="text-2xl font-bold mb-4 ml-5">{category}</h1>
           <div className="grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-4">
-            {paginatedProducts.map((item) => (
-              <ProductCard key={item.id} product={item} />
+            {filtered.map((item) => (
+              <ProductCard key={item._id} product={item} />
             ))}
           </div>
           <div className="flex justify-center mt-6">

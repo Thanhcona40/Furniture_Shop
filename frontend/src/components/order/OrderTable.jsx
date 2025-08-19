@@ -10,7 +10,11 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import CircularProgress from '@mui/material/CircularProgress';
 
-const OrderTable = ({ orders, addressCache, onShowDetail, onCancelOrder, getStatusColor, getStatusText, getPaymentText }) => {
+const formatAddress = (address) => {
+  return [address.detail,address.ward_id?.name, address.district_id?.name,address.province_id?.name].filter(Boolean).join(', ');
+};
+
+const OrderTable = ({ orders, onShowDetail, onCancelOrder, getStatusColor, getStatusText, getPaymentText }) => {
   return (
     <div className="overflow-x-auto">
       <TableContainer component={Paper} sx={{ border: '1px solid #d1d5db' }}>
@@ -64,7 +68,7 @@ const OrderTable = ({ orders, addressCache, onShowDetail, onCancelOrder, getStat
                   {order.total.toLocaleString('vi-VN')}đ
                 </TableCell>
                 <TableCell sx={{ textAlign: 'center', border: '1px solid #d1d5db', padding: '8px 16px' }}>
-                  {addressCache[order._id] || order.shipping_address.detail || <CircularProgress size={16} />}
+                  {formatAddress(order.shipping_address) || <CircularProgress size={16} />}
                 </TableCell>
                 <TableCell sx={{ textAlign: 'center', border: '1px solid #d1d5db', padding: '8px 16px' }}>
                   <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>

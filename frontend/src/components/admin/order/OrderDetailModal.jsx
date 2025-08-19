@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import { statusColor, statusLabel, nextStatus } from '../../../utils/orderConstants';
+import { formatAddress } from '../../../utils/formatAddress';
 
 const OrderDetailModal = ({ 
   open, 
@@ -36,7 +37,7 @@ const OrderDetailModal = ({
                     <img
                       src={item.variant_id?.url_media || item.product_id?.thumbnail_url}
                       alt={item.product_id?.name}
-                      className="w-14 h-14 object-cover rounded"
+                      className="w-28 h-28 object-cover rounded"
                     />
                     <div className="flex-1">
                       <div className="font-medium">{item.product_id?.name}</div>
@@ -54,7 +55,7 @@ const OrderDetailModal = ({
             </div>
             
             <div className="mb-2 text-sm text-gray-600">
-              <div>Địa chỉ giao: {selectedOrder.shipping_address?.detail || 'Đang tải...'}</div>
+              <div>Địa chỉ giao: {formatAddress(selectedOrder.shipping_address) || 'Đang tải...'}</div>
             </div>
             
             <div className="flex justify-between mt-4 text-base">

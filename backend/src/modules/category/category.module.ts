@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CategorySchema } from './category.schema';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { AuthModule } from '../auth/auth.module';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AuthModule } from '../auth/auth.module';
       { name: 'Category', schema: CategorySchema }
     ]),
     AuthModule,
+    RedisModule
   ],
   providers: [CategoryService, RolesGuard],
   controllers: [CategoryController]
