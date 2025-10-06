@@ -2,12 +2,23 @@ import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import AddVariantForm from './AddVariantForm';
 import { deleteVariant } from '../../../api/product';
+import { OptimizedImage } from '../../common';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CircularProgress from '@mui/material/CircularProgress';
+import Pagination from '@mui/material/Pagination';
 
-const ProductTable = ({ products, setProducts, onDelete, onEditModal, loading }) => {
+const ProductTable = ({ 
+  products, 
+  setProducts, 
+  onDelete, 
+  onEditModal, 
+  loading,
+  page,
+  totalPages,
+  onPageChange,
+}) => {
   const [showVariantForm, setShowVariantForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -99,10 +110,11 @@ const ProductTable = ({ products, setProducts, onDelete, onEditModal, loading })
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <img
+                  <OptimizedImage
                     src={product.thumbnail_url}
                     alt={product.name}
                     className="h-16 w-16 object-cover rounded"
+                    cloudinaryTransform="w_64,h_64,c_fill,q_auto,f_auto"
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-primary font-medium">
@@ -197,6 +209,20 @@ const ProductTable = ({ products, setProducts, onDelete, onEditModal, loading })
           }
         </tbody>
       </table>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center py-4 border-t border-gray-200">
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={onPageChange}
+            color="primary"
+            showFirstButton
+            showLastButton
+          />
+        </div>
+      )}
 
       {showVariantForm && selectedProduct && (
         <AddVariantForm

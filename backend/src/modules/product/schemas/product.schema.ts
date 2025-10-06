@@ -12,9 +12,9 @@ export class Product{
   @Prop() sold: number;
   @Prop() total_reviews: number;
   @Prop() is_featured: boolean;
-  @Prop({ type: Types.ObjectId, ref: 'Category' }) category_id: Category;
-  @Prop({ type: [{ type: String, ref: 'VariantProduct' }], default: [] }) // Mảng _id của VariantProduct
-  variants: string[];
+  @Prop({ type: Types.ObjectId, ref: 'Category' }) category_id: Types.ObjectId;
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'VariantProduct' }], default: [] })
+  variants: Types.ObjectId[];
 }
 
 export type ProductDocument = Product & Document;

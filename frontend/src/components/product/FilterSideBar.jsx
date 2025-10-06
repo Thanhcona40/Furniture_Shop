@@ -1,53 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
+import { PRICE_RANGES, CATEGORIES } from '../../constants';
 
-const prices = [
-  { label: "Dưới 100.000₫", value: "under-100" },
-  { label: "100.000₫ - 200.000₫", value: "100-200" },
-  { label: "200.000₫ - 300.000₫", value: "200-300" },
-  { label: "300.000₫ - 500.000₫", value: "300-500" },
-  { label: "500.000₫ - 1.000.000₫", value: "500-1000" },
-  { label: "Trên 1.000.000₫", value: "over-1000" },
-];
-
-const FilterSidebar = ({ onChange, filters, onFilterChange }) => {
+const FilterSidebar = React.memo(({ onChange, filters, onFilterChange }) => {
   const location = useLocation();
   const currentPath = location.pathname;
   const navigate = useNavigate();
 
-  const isActive = (path) => currentPath === path;
+  const isActive = useCallback((path) => currentPath === path, [currentPath]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const [selectedBrands, setSelectedBrands] = React.useState([]);
+  const [selectedBrands, setSelectedBrands] = useState([]);
   const [selectedPrices, setSelectedPrices] = useState([]);
 
   // Handle filter changes for search page
-  const handleFilterChange = (key, value) => {
-    if (onFilterChange) {
-      onFilterChange({ [key]: value });
-    }
-  };
+  const handleFilterChange = useCallback((key, value) => {
+    onFilterChange?.({ [key]: value });
+  }, [onFilterChange]);
 
-  const handleBrandChange = (brand) => {
-    let updatedBrands = selectedBrands.includes(brand)
-      ? selectedBrands.filter((b) => b !== brand)
-      : [...selectedBrands, brand];
-    setSelectedBrands(updatedBrands);
-    if (onChange) {
-      onChange({ brands: updatedBrands, prices: selectedPrices });
-    }
-  };
+  const handleBrandChange = useCallback((brand) => {
+    setSelectedBrands(prev => {
+      const updatedBrands = prev.includes(brand)
+        ? prev.filter((b) => b !== brand)
+        : [...prev, brand];
+      
+      onChange?.({
+        brands: updatedBrands,
+        prices: selectedPrices
+      });
+      
+      return updatedBrands;
+    });
+  }, [onChange, selectedPrices]);
 
-  const handlePriceChange = (price) => {
-    let updatedPrices = selectedPrices.includes(price)
-      ? selectedPrices.filter((p) => p !== price)
-      : [...selectedPrices, price];
-    setSelectedPrices(updatedPrices);
-    if (onChange) {
-      onChange({ brands: selectedBrands, prices: updatedPrices });
-    }
-  };
+  const handlePriceChange = useCallback((price) => {
+    setSelectedPrices(prev => {
+      const updatedPrices = prev.includes(price)
+        ? prev.filter((p) => p !== price)
+        : [...prev, price];
+      
+      onChange?.({
+        brands: selectedBrands,
+        prices: updatedPrices
+      });
+      
+      return updatedPrices;
+    });
+  }, [onChange, selectedBrands]);
+
+  const handleCategoryClick = useCallback((category) => {
+    navigate(`/allproducts?category=${encodeURIComponent(category)}`);
+  }, [navigate]);
+
+  const toggleDropdown = useCallback(() => {
+    setShowDropdown(prev => !prev);
+  }, []);
 
   // If this is for search page, render search-specific filters
   if (filters && onFilterChange) {
@@ -70,12 +78,9 @@ const FilterSidebar = ({ onChange, filters, onFilterChange }) => {
               className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-primary"
             >
               <option value="">Tất cả danh mục</option>
-              <option value="Sofa">Sofa</option>
-              <option value="Ghế">Ghế</option>
-              <option value="Trang trí">Trang trí</option>
-              <option value="Kệ sách">Kệ sách</option>
-              <option value="Bàn">Bàn</option>
-              <option value="Tủ quần áo">Tủ quần áo</option>
+              {CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
 
@@ -153,18 +158,18 @@ const FilterSidebar = ({ onChange, filters, onFilterChange }) => {
                 SẢN PHẨM
               </span>
               <ArrowDropDownOutlinedIcon
-                onClick={() => setShowDropdown(!showDropdown)}
+                onClick={toggleDropdown}
                 className={`transition-transform duration-200 ${showDropdown ? "rotate-180" : "rotate-0"}`}
               />
             </div>
 
             {showDropdown && (
               <div className="mt-2 ml-4 space-y-1 flex flex-col">
-                {["Sofa", "Ghế", "Trang trí", "Kệ sách", "Bàn", "Tủ quần áo"].map((item, index) => (
+                {CATEGORIES.map((item) => (
                   <span
-                    key={index}
+                    key={item}
                     className="px-2 py-1 text-sm text-black hover:text-primary cursor-pointer"
-                    onClick={() => navigate(`/allproducts?category=${encodeURIComponent(item)}`)}
+                    onClick={() => handleCategoryClick(item)}
                   >
                     {item}
                   </span>
@@ -191,12 +196,12 @@ const FilterSidebar = ({ onChange, filters, onFilterChange }) => {
           </h3>
         </div>
 
-        <div className=" border border-primary p-2 rounded-lg">
-          {prices.map((p) => (
-            <label key={p.value} className="flex items-center gap-2 p-3 cursor-pointer">
+        <div className="border border-primary p-2 rounded-lg">
+          {PRICE_RANGES.map((p) => (
+            <label key={p.value} className="flex items-center gap-2 p-3 cursor-pointer hover:bg-gray-50 transition-colors">
               <input
                 type="checkbox"
-                className="appearance-none w-4 h-4 rounded-full border border-gray-300 checked:bg-primary"
+                className="appearance-none w-4 h-4 rounded-full border border-gray-300 checked:bg-primary cursor-pointer"
                 checked={selectedPrices.includes(p.value)}
                 onChange={() => handlePriceChange(p.value)}
               />
@@ -207,6 +212,8 @@ const FilterSidebar = ({ onChange, filters, onFilterChange }) => {
       </div>
     </div>
   );
-};
+});
+
+FilterSidebar.displayName = 'FilterSidebar';
 
 export default FilterSidebar;

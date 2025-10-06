@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common/exceptions/unauthorized.exception';
 import * as bcrypt from 'bcrypt';
 import { UserDocument } from '../user/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -18,7 +17,9 @@ export class AuthService {
 
   async register(createUser: CreateUserDto) {
     const existingUser = await this.userModel.findOne({ email: createUser.email });
-    if (existingUser) throw new UnauthorizedException('Người dùng đã tồn tại');
+    if (existingUser) {
+      throw new ConflictException('Email đã được sử dụng. Vui lòng sử dụng email khác.');
+    }
 
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(createUser.password, salt);
@@ -35,10 +36,14 @@ export class AuthService {
 
   async login(loginUser: LoginUserDto) {
     const user = await this.userModel.findOne({ email: loginUser.email });
-    if (!user) throw new UnauthorizedException('Người dùng không tồn tại');
+    if (!user) {
+      throw new UnauthorizedException('Email không tồn tại trong hệ thống');
+    }
 
     const isMatch = await bcrypt.compare(loginUser.password, user.password);
-    if (!isMatch) throw new UnauthorizedException('Mật khẩu không đúng');
+    if (!isMatch) {
+      throw new UnauthorizedException('Mật khẩu không chính xác');
+    }
 
     const payload = { user_id: user._id, email: user.email, role: user.role };
     return { 

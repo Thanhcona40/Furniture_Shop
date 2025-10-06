@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import breadcrumb from '../assets/breadcrumb.jpg';
 import KeyboardArrowRightOutlinedIcon from '@mui/icons-material/KeyboardArrowRightOutlined';
 import { Link, useLocation } from 'react-router-dom';
 
-const pageNameMap = {
+const PAGE_NAME_MAP = {
   about: "Giới thiệu",
   blog: "Tin tức",
   contact: "Liên hệ",
@@ -16,18 +16,18 @@ const pageNameMap = {
   login: "Đăng nhập tài khoản",
   register: "Đăng kí tài khoản",
   account: "Tài khoản",
-  orders_user : "Đơn hàng",
+  orders_user: "Đơn hàng",
   change_password: "Đổi mật khẩu",
 };
 
 function getBreadcrumbs(pathname) {
   const pathParts = pathname.split('/').filter(Boolean);
-  let breadcrumbs = [];
+  const breadcrumbs = [];
   let accumulatedPath = '';
 
   pathParts.forEach((part, idx) => {
     accumulatedPath += `/${part}`;
-    let name = pageNameMap[part];
+    let name = PAGE_NAME_MAP[part];
     // Xử lý route động như /product/:id
     if (!name && idx > 0 && pathParts[idx - 1] === 'product') {
       name = 'Chi tiết sản phẩm';
@@ -38,26 +38,41 @@ function getBreadcrumbs(pathname) {
   return breadcrumbs;
 }
 
-const Breadcrumbs = () => {
+const Breadcrumbs = React.memo(() => {
   const location = useLocation();
-  const breadcrumbs = getBreadcrumbs(location.pathname);
+  
+  const breadcrumbs = useMemo(() => {
+    return getBreadcrumbs(location.pathname);
+  }, [location.pathname]);
 
-  // Lấy category từ query string nếu có
-  const params = new URLSearchParams(location.search);
-  const category = params.get('category');
+  const category = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('category');
+  }, [location.search]);
 
-  // Nếu đang ở allproducts và có category, thêm breadcrumb cho category
-  let displayBreadcrumbs = [...breadcrumbs];
-  if (
-    breadcrumbs.length > 0 &&
-    breadcrumbs[breadcrumbs.length - 1].path === '/allproducts' &&
-    category
-  ) {
-    displayBreadcrumbs.push({
-      name: category,
-      path: `${breadcrumbs[breadcrumbs.length - 1].path}?category=${encodeURIComponent(category)}`
-    });
-  }
+  const displayBreadcrumbs = useMemo(() => {
+    const crumbs = [...breadcrumbs];
+    
+    // Nếu đang ở allproducts và có category, thêm breadcrumb cho category
+    if (
+      crumbs.length > 0 &&
+      crumbs[crumbs.length - 1].path === '/allproducts' &&
+      category
+    ) {
+      crumbs.push({
+        name: category,
+        path: `${crumbs[crumbs.length - 1].path}?category=${encodeURIComponent(category)}`
+      });
+    }
+    
+    return crumbs;
+  }, [breadcrumbs, category]);
+
+  const pageTitle = useMemo(() => {
+    return displayBreadcrumbs.length > 0 
+      ? displayBreadcrumbs[displayBreadcrumbs.length - 1].name 
+      : '';
+  }, [displayBreadcrumbs]);
 
   return (
     <div className="relative h-[200px]">
@@ -68,16 +83,14 @@ const Breadcrumbs = () => {
       />
       <div className="absolute inset-0 bg-black/30 z-10" />
       <div className="relative z-20 flex flex-col items-center justify-center h-full text-white text-center px-4">
-        <h1 className="text-4xl mb-2">
-          {displayBreadcrumbs.length > 0 ? displayBreadcrumbs[displayBreadcrumbs.length - 1].name : ''}
-        </h1>
+        <h1 className="text-4xl mb-2">{pageTitle}</h1>
         <p className="text-sm sm:text-base flex items-center justify-center">
-          <Link to="/">Trang chủ</Link>
+          <Link to="/" className="hover:text-primary transition-colors">Trang chủ</Link>
           {displayBreadcrumbs.map((bc, idx) => (
             <React.Fragment key={bc.path}>
               <KeyboardArrowRightOutlinedIcon />
               {idx < displayBreadcrumbs.length - 1 ? (
-                <Link to={bc.path} className="hover:text-primary">
+                <Link to={bc.path} className="hover:text-primary transition-colors">
                   {bc.name}
                 </Link>
               ) : (
@@ -89,6 +102,8 @@ const Breadcrumbs = () => {
       </div>
     </div>
   );
-};
+});
+
+Breadcrumbs.displayName = 'Breadcrumbs';
 
 export default Breadcrumbs;

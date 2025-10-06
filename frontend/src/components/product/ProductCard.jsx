@@ -1,18 +1,19 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { OptimizedImage } from '../common';
 import { addCartItem, initializeCart } from '../../redux/actions/cartActions';
 
-const ProductCard = ({ product }) => {
+const ProductCard = React.memo(({ product }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const { cartId, status } = useSelector((state) => state.cart);
 
-  const handleAddToCart = async (e) => {
+  const handleAddToCart = useCallback(async (e) => {
     e.stopPropagation();
     
     if (!user || !user._id) {
@@ -54,21 +55,30 @@ const ProductCard = ({ product }) => {
       console.error('Error adding to cart:', error);
       toast.error(error?.message || "Lỗi thêm vào giỏ hàng!");
     }
-  };
+  }, [user, cartId, dispatch, product]);
 
-  const handleViewProduct = (e) => {
+  const handleViewProduct = useCallback((e) => {
     e.stopPropagation();
     navigate(`/product/${product._id}`);
-  };
+  }, [navigate, product._id]);
+
+  // Memoize giá sản phẩm
+  const displayPrice = useMemo(() => {
+    if (product.variants && product.variants.length > 0) {
+      return product.variants[0].price?.toLocaleString('vi-VN') || product.price?.toLocaleString('vi-VN');
+    }
+    return product.price?.toLocaleString('vi-VN');
+  }, [product]);
 
   return (
     <div className="group relative overflow-hidden max-h-[250px] transition-all flex flex-col items-center justify-center">
       {/* Image + overlay icons */}
       <div className="relative h-full overflow-hidden inline-block">
-        <img
+        <OptimizedImage
           src={product.thumbnail_url}
           alt={product.name}
           className="w-full h-full object-contain bg-white"
+          cloudinaryTransform="w_300,h_300,c_fill,q_auto,f_auto"
         />
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
@@ -94,19 +104,14 @@ const ProductCard = ({ product }) => {
       <div className="p-3">
         <h4 className="text-gray-800 font-medium text-xs line-clamp-2 mb-2">{product.name}</h4>
         <p className="text-primary font-medium text-center">
-          {(() => {
-            // Nếu có variants, hiển thị giá của variant đầu tiên
-            if (product.variants && product.variants.length > 0) {
-              return product.variants[0].price?.toLocaleString('vi-VN') || product.price?.toLocaleString('vi-VN');
-            }
-            // Nếu không có variants, hiển thị giá của product
-            return product.price?.toLocaleString('vi-VN');
-          })()}
+          {displayPrice}
           <span className="text-xs inline-block ml-1 relative -top-1 underline"> đ</span>
         </p>
       </div>
     </div>
   );
-};
+});
+
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { deleteProduct, getProducts } from '../../../api/product';
@@ -6,13 +6,30 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ProductTable from './ProductTable';
 import AddProduct from './AddProduct.';
 import EditProduct from './EditProduct';
+import useListPage from '../../../hooks/useListPage';
 
 const ProductManagement = () => {
   const [addProductModal, setAddProductModal] = useState(false);
   const [editProductModal, setEditProductModal] = useState(false);
-  const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  // Use custom hook for list management
+  const {
+    data: products,
+    loading,
+    total,
+    totalPages,
+    page,
+    handlePageChange,
+    addItem,
+    updateItem,
+    removeItem,
+    setData: setProducts,
+  } = useListPage(() => getProducts(), {
+    itemsPerPage: 10,
+    initialSortBy: 'createdAt',
+    initialSortOrder: 'desc',
+  });
 
   const handleOpenAddModal = () => setAddProductModal(true);
   const handleCloseAddModal = () => setAddProductModal(false);
@@ -23,7 +40,7 @@ const ProductManagement = () => {
   const handleDelete = async (productId) => {
     try {
       await deleteProduct(productId);
-      setProducts(products.filter((p) => p._id !== productId));
+      removeItem(productId);
       toast.success('Xóa sản phẩm thành công!');
     } catch (err) {
       toast.error(err?.response?.data?.message);
@@ -31,7 +48,7 @@ const ProductManagement = () => {
   };
 
   const handleAdd = (newProduct) => {
-    setProducts((prev) => [...prev, newProduct]);
+    addItem(newProduct);
   };
 
   const handleEdit = (selectProduct) => {
@@ -40,26 +57,9 @@ const ProductManagement = () => {
   };
 
   const handleSave = (updatedProduct) => {
-    setProducts((prev) =>
-      prev.map((p) => (p._id === updatedProduct._id ? updatedProduct : p))
-    );
+    updateItem(updatedProduct._id, updatedProduct);
     handleCloseEditModal();
   };
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await getProducts();
-        setProducts(response.data);
-      } catch (err) {
-        toast.error(err?.response?.data?.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
 
   return (
     <div className="p-6">
@@ -81,6 +81,10 @@ const ProductManagement = () => {
           onDelete={handleDelete}
           onEditModal={handleEdit}
           loading={loading}
+          // Pagination props
+          page={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
         />
       </div>
 

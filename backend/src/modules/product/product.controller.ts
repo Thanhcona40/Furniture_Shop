@@ -5,6 +5,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '../../common/enums/role.enum';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { CreateProductDto, UpdateProductDto, CreateVariantDto, UpdateVariantDto, ProductFilterDto } from './dto';
 
 @Controller('products')
 export class ProductController {
@@ -12,10 +13,8 @@ export class ProductController {
 
   // Public APIs - không cần guard
   @Get()
-  async findAll(@Query() query: PaginationDto) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 20;
-    return this.productsService.findAll({page, limit});
+  async findAll(@Query() filterDto: ProductFilterDto) {
+    return this.productsService.findAll(filterDto);
   }
 
   @Get('search')
@@ -27,14 +26,14 @@ export class ProductController {
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
-  async create(@Body() createProductDto: any) {
+  async create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
 
   @Put(':id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
-  async update(@Param('id') id: string, @Body() updateProductDto: any) {
+  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(id, updateProductDto);
   }
 
@@ -48,14 +47,14 @@ export class ProductController {
   @Post(':id/variants')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
-  async addVariant(@Param('id') id: string, @Body() variantData: any) {
+  async addVariant(@Param('id') id: string, @Body() variantData: CreateVariantDto) {
     return this.productsService.addVariant(id, variantData);
   }
 
   @Put('variants/:variantId')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(Role.Admin)
-  async updateVariant(@Param('variantId') variantId: string, @Body() updateVariantDto: any) {
+  async updateVariant(@Param('variantId') variantId: string, @Body() updateVariantDto: UpdateVariantDto) {
     return this.productsService.updateVariant(variantId, updateVariantDto);
   }
 

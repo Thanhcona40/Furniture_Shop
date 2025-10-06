@@ -52,7 +52,9 @@ export const WebSocketProvider = ({ children }) => {
   // Kết nối websocket
   useEffect(() => {
     if (token) {
-      const newSocket = io('https://furniture-shop-x2n4.onrender.com', {
+      const WEBSOCKET_URL = process.env.REACT_APP_WEBSOCKET_URL || 'https://furniture-shop-x2n4.onrender.com';
+      
+      const newSocket = io(WEBSOCKET_URL, {
         auth: {
           token: token,
         },

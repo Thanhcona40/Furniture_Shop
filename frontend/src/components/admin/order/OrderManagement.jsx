@@ -8,10 +8,9 @@ import AdminOrderTable from './AdminOrderTable';
 import OrderDetailModal from './OrderDetailModal';
 import ConfirmDialog from './ConfirmDialog';
 import OrderFilterBar from './OrderFilterBar';
+import useListPage from '../../../hooks/useListPage';
 
 const OrderManagement = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderTrack, setOrderTrack] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -26,6 +25,17 @@ const OrderManagement = () => {
   const [dateFilter, setDateFilter] = useState(null);
   const [sortOrder, setSortOrder] = useState('desc'); // 'desc' hoặc 'asc'
 
+  // Use custom hook for list management
+  const {
+    data: orders,
+    loading,
+    updateItem,
+    setData: setOrders,
+  } = useListPage(() => getAllOrders(status), {
+    itemsPerPage: 50,
+    autoFetch: false, // Manual control because we need status param
+  });
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -33,12 +43,10 @@ const OrderManagement = () => {
         setOrders(data);
       } catch (err) {
         setSnackbar({ open: true, message: 'Lỗi tải danh sách đơn hàng', severity: 'error' });
-      } finally {
-        setLoading(false);
       }
     };
     fetchOrders();
-  }, [status]);
+  }, [status, setOrders]);
 
   const handleViewDetail = async (orderId) => {
     setModalLoading(true);
@@ -83,7 +91,9 @@ const OrderManagement = () => {
       await updateOrderStatus(pendingStatus.orderId, pendingStatus.status);
       setSnackbar({ open: true, message: 'Cập nhật trạng thái thành công!', severity: 'success' });
       handleViewDetail(pendingStatus.orderId);
-      const data = await getAllOrders();
+      
+      // Update local state
+      const data = await getAllOrders(status);
       setOrders(data);
     } catch (err) {
       setSnackbar({ open: true, message: 'Cập nhật trạng thái thất bại!', severity: 'error' });

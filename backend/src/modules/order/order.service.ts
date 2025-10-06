@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model, Types, ClientSession } from 'mongoose';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
 import { Order, OrderDocument } from './schemas/order.schema';
 import { OrderItem, OrderItemDocument } from './schemas/order-item.schema';
 import { OrderTrack, OrderTrackDocument } from './schemas/order-track.schema';
@@ -10,6 +12,7 @@ import { OrderStatus } from 'src/common/enums/order-status.enum';
 import { ProductService } from '../product/product.service';
 import { Role } from 'src/common/enums/role.enum';
 import { WebsocketService } from '../websocket/websocket.service';
+import { withTransaction } from 'src/common/utils/transaction.util';
 
 @Injectable()
 export class OrderService {
@@ -18,10 +21,27 @@ export class OrderService {
     @InjectModel(OrderItem.name) private orderItemModel: Model<OrderItemDocument>,
     @InjectModel(OrderTrack.name) private orderTrackModel: Model<OrderTrackDocument>,
     @InjectModel(UserAddress.name) private userAddressModel: Model<UserAddressDocument>,
+    @InjectConnection() private connection: Connection,
     private productService: ProductService,
     private websocketService: WebsocketService,
   ) {}
 
+  /**
+   * Create a new order with transaction support
+   * This ensures atomicity - either all operations succeed or all fail
+   * 
+   * Operations within transaction:
+   * 1. Update default address if needed
+   * 2. Create order items
+   * 3. Decrease product/variant stock
+   * 4. Create order
+   * 5. Create order tracking record
+   * 
+   * @param createOrderDto - Order data
+   * @param userId - User ID creating the order
+   * @returns Created order with populated data
+   * @throws BadRequestException if any operation fails
+   */
   async createOrder(createOrderDto: CreateOrderDto, userId: string) {
     const {
       items,
@@ -32,96 +52,120 @@ export class OrderService {
       total
     } = createOrderDto;
 
-    // Tạo mã đơn hàng tự động
-    const orderCode = this.generateOrderCode();
+    // Start a MongoDB session for transaction
+    const session: ClientSession = await this.connection.startSession();
+    
+    try {
+      // Start transaction
+      session.startTransaction();
 
-    // Xử lý địa chỉ mặc định nếu có
-    if (shipping_address.is_default) {
-      // Set is_default = false cho tất cả địa chỉ khác của user
-      await this.userAddressModel.updateMany(
-        { user_id: userId },
-        { is_default: false }
+      // Tạo mã đơn hàng tự động
+      const orderCode = this.generateOrderCode();
+
+      // Xử lý địa chỉ mặc định nếu có
+      if (shipping_address.is_default) {
+        // Set is_default = false cho tất cả địa chỉ khác của user
+        await this.userAddressModel.updateMany(
+          { user_id: userId },
+          { is_default: false },
+          { session }
+        );
+
+        // Lưu địa chỉ mới vào UserAddress với is_default = true
+        const newUserAddress = new this.userAddressModel({
+          user_id: userId,
+          address: {
+            detail: shipping_address.detail,
+            province_id: shipping_address.province_id,
+            district_id: shipping_address.district_id,
+            ward_id: shipping_address.ward_id,
+          },
+          full_name: shipping_address.full_name,
+          email: shipping_address.email,
+          phone: shipping_address.phone,
+          is_default: true
+        });
+        await newUserAddress.save({ session });
+      }
+
+      // Tạo order items và giảm stock
+      const orderItems = await Promise.all(
+        items.map(async (item) => {
+          const orderItem = new this.orderItemModel({
+            product_id: item.product_id,
+            variant_id: item.variant_id,
+            quantity: item.quantity,
+            price: item.price,
+            total: item.quantity * item.price
+          });
+          
+          // Giảm stock cho variant hoặc product (với session)
+          if (item.variant_id) {
+            await this.productService.decreaseStock(item.variant_id, item.quantity, session);
+          } else {
+            // Nếu không có variant, giảm stock của product
+            await this.productService.decreaseProductStock(item.product_id, item.quantity, session);
+          }
+          
+          return await orderItem.save({ session });
+        })
       );
 
-      // Lưu địa chỉ mới vào UserAddress với is_default = true
-      const newUserAddress = new this.userAddressModel({
+      // Tạo order
+      const order = new this.orderModel({
+        order_code: orderCode,
         user_id: userId,
-        address: {
-          detail: shipping_address.detail,
-          province_id: shipping_address.province_id,
-          district_id: shipping_address.district_id,
-          ward_id: shipping_address.ward_id,
-        },
-        full_name: shipping_address.full_name,
-        email: shipping_address.email,
-        phone: shipping_address.phone,
-        is_default: true
+        items: orderItems.map(item => item._id),
+        shipping_address,
+        payment_method,
+        subtotal,
+        shipping_fee,
+        total,
+        status: 'pending'
       });
-      await newUserAddress.save();
+
+      const savedOrder = await order.save({ session });
+
+      // Tạo order track
+      const orderTrack = new this.orderTrackModel({
+        order_id: savedOrder._id,
+        status: 'pending',
+        description: 'Đơn hàng đã được tạo'
+      });
+      await orderTrack.save({ session });
+
+      // Commit transaction
+      await session.commitTransaction();
+
+      // Populate để trả về dữ liệu đầy đủ (sau khi commit)
+      const populatedOrder = await this.orderModel.findById(savedOrder._id)
+        .populate({
+          path: 'items',
+          populate: [
+            { path: 'product_id' },
+            { 
+              path: 'variant_id',
+              options: { strictPopulate: false }
+            }
+          ]
+        })
+        .populate('user_id', 'full_name email phone');
+
+      // Gửi thông báo đơn hàng mới cho admin
+      await this.websocketService.notifyAdminNewOrder(populatedOrder);
+
+      return populatedOrder;
+      
+    } catch (error) {
+      // Rollback transaction on error
+      await session.abortTransaction();
+      throw new BadRequestException(
+        `Không thể tạo đơn hàng: ${error.message}`
+      );
+    } finally {
+      // End session
+      session.endSession();
     }
-
-    // Tạo order items
-    const orderItems = await Promise.all(
-      items.map(async (item) => {
-        const orderItem = new this.orderItemModel({
-          product_id: item.product_id,
-          variant_id: item.variant_id,
-          quantity: item.quantity,
-          price: item.price,
-          total: item.quantity * item.price
-        });
-        // Giảm stock cho variant hoặc product
-        if (item.variant_id) {
-          await this.productService.decreaseStock(item.variant_id, item.quantity);
-        } else {
-          // Nếu không có variant, giảm stock của product
-          await this.productService.decreaseProductStock(item.product_id, item.quantity);
-        }
-        return await orderItem.save();
-      })
-    );
-
-    // Tạo order
-    const order = new this.orderModel({
-      order_code: orderCode,
-      user_id: userId,
-      items: orderItems.map(item => item._id),
-      shipping_address,
-      payment_method,
-      subtotal,
-      shipping_fee,
-      total,
-      status: 'pending'
-    });
-
-    const savedOrder = await order.save();
-
-    // Tạo order track
-    const orderTrack = new this.orderTrackModel({
-      order_id: savedOrder._id,
-      status: 'pending',
-      description: 'Đơn hàng đã được tạo'
-    });
-    await orderTrack.save();
-
-    // Populate để trả về dữ liệu đầy đủ
-    const populatedOrder = await this.orderModel.findById(savedOrder._id)
-      .populate({
-        path: 'items',
-        populate: [
-          { path: 'product_id' },
-          { 
-            path: 'variant_id',
-            options: { strictPopulate: false }
-          }
-        ]
-      })
-      .populate('user_id', 'full_name email phone');
-
-    // Gửi thông báo đơn hàng mới cho admin
-    await this.websocketService.notifyAdminNewOrder(populatedOrder);
-
-    return populatedOrder;
   }
 
   // Hàm tạo mã đơn hàng tự động

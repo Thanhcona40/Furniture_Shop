@@ -17,14 +17,28 @@ const AddCategory = ({ onAdd, open, onClose }) => {
 
   const handleAddCategory = async (e) => {
     e.preventDefault();
+    
+    // Validate
+    if (!newCategory.name.trim()) {
+      toast.error('Tên danh mục không được để trống');
+      return;
+    }
+    
+    if (!newCategory.image) {
+      toast.error('Vui lòng chọn hình ảnh');
+      return;
+    }
+    
     try {
       const response = await addCategory(newCategory);
       onAdd(response.data);
       setNewCategory({ name: '', image: '' });
       setSelectedImage(null);
+      toast.success('Thêm danh mục thành công!');
       onClose();
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Có lỗi xảy ra');
+      const errorMessage = err?.response?.data?.message || 'Có lỗi xảy ra khi thêm danh mục';
+      toast.error(errorMessage);
     }
   };
 
@@ -35,13 +49,28 @@ const AddCategory = ({ onAdd, open, onClose }) => {
 
   const handleImageChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Kích thước ảnh không được vượt quá 5MB');
+        return;
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Vui lòng chọn file ảnh hợp lệ');
+        return;
+      }
+      
       setIsUploading(true);
       try {
-        const file = await uploadToCloudinary(e.target.files[0]);
-        setSelectedImage(file);
-        setNewCategory(prev => ({ ...prev, image: file }));
+        const uploadedUrl = await uploadToCloudinary(file);
+        setSelectedImage(uploadedUrl);
+        setNewCategory(prev => ({ ...prev, image: uploadedUrl }));
       } catch (err) {
-        toast.error('Lỗi tải lên ảnh');
+        const errorMessage = err?.response?.data?.message || 'Lỗi tải lên ảnh';
+        toast.error(errorMessage);
       } finally {
         setIsUploading(false);
       }

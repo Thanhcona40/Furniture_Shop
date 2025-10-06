@@ -1,98 +1,210 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Furniture Shop - Backend API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API for Furniture E-commerce Platform built with NestJS, MongoDB, and TypeScript.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Features
 
-## Description
+- **Authentication & Authorization**: JWT-based authentication with role-based access control (Admin/User)
+- **Product Management**: Full CRUD operations with variants, reviews, and categories
+- **Shopping Cart**: Persistent cart management
+- **Order System**: Complete order processing with status tracking
+- **Payment Integration**: VNPay payment gateway integration
+- **Real-time Notifications**: WebSocket-based notifications for users and admins
+- **Address Management**: Province/District/Ward hierarchical address system
+- **Blog System**: Content management for articles
+- **Dashboard Analytics**: Sales and user statistics
+- **Redis Caching**: Performance optimization with Redis
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 📋 Prerequisites
 
-## Project setup
+Before you begin, ensure you have the following installed:
+- **Node.js** (v16 or higher)
+- **npm** or **yarn**
+- **MongoDB** (v4.4 or higher)
+- **Redis** (optional, for caching)
 
+## 🛠️ Installation
+
+1. Clone the repository:
 ```bash
-$ npm install
+git clone <repository-url>
+cd backend
 ```
 
-## Compile and run the project
-
+2. Install dependencies:
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+3. **Environment Configuration**:
 
+Copy the `.env.example` file to create your `.env` file:
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+cp .env.example .env
 ```
 
-## Deployment
+Then update the `.env` file with your actual configuration:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```env
+# Database
+MONGODB_URI=mongodb://localhost:27017/furniture_shop
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+# JWT
+JWT_SECRET=your-secret-key-here
+JWT_EXPIRES_IN=7d
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Admin Account (Required for first-time setup)
+ADMIN_EMAIL=admin@furniture-shop.com
+ADMIN_PASSWORD=YourStrongPassword123!
+ADMIN_FULL_NAME=Admin
+ADMIN_PHONE=0123456789
+
+# Server
+PORT=3000
+CORS_ORIGIN=http://localhost:3001
+
+# VNPay (Optional - for payment integration)
+VNPAY_TMN_CODE=your_tmn_code
+VNPAY_HASH_SECRET=your_hash_secret
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+⚠️ **Important**: 
+- Change `ADMIN_PASSWORD` to a strong password
+- Never commit `.env` file to version control
+- Use different JWT secrets for development and production
 
-## Resources
+4. **Start MongoDB** (if not running):
+```bash
+# Using Docker
+docker run -d -p 27017:27017 --name mongodb mongo:latest
 
-Check out a few resources that may come in handy when working with NestJS:
+# Or start local MongoDB service
+sudo service mongod start  # Linux
+brew services start mongodb-community  # macOS
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 🚀 Running the Application
 
-## Support
+```bash
+# Development mode with hot-reload
+npm run start:dev
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# Production mode
+npm run build
+npm run start:prod
+```
 
-## Stay in touch
+The server will start on `http://localhost:3000` (or the PORT you specified).
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+On first run, the application will automatically create an admin account using the credentials from your `.env` file.
 
-## License
+## 📁 Project Structure
+
+```
+src/
+├── common/              # Shared utilities
+│   ├── decorators/      # Custom decorators (e.g., @Roles())
+│   ├── dto/            # Common DTOs (e.g., pagination)
+│   ├── enums/          # Enums (roles, order status, etc.)
+│   └── guards/         # Auth guards (JWT, Roles)
+├── modules/            # Feature modules
+│   ├── auth/          # Authentication
+│   ├── user/          # User management
+│   ├── product/       # Products & variants
+│   ├── category/      # Categories
+│   ├── cart/          # Shopping cart
+│   ├── order/         # Order processing
+│   ├── payment/       # Payment integration
+│   ├── address/       # Address management
+│   ├── notification/  # Notifications
+│   ├── blog/          # Blog posts
+│   ├── dashboard/     # Analytics
+│   ├── websocket/     # Real-time features
+│   └── redis/         # Caching
+├── response/          # Response transformers
+├── app.module.ts      # Root module
+└── main.ts           # Application entry point
+```
+
+## 🧪 Testing
+
+```bash
+# Unit tests
+npm run test
+
+# E2E tests
+npm run test:e2e
+
+# Test coverage
+npm run test:cov
+```
+
+## 📚 API Documentation
+
+Once the server is running, you can access:
+- **Swagger UI**: `http://localhost:3000/api/docs` (Coming soon)
+- **API Health**: `http://localhost:3000/`
+
+## 🔐 Authentication
+
+The API uses JWT (JSON Web Tokens) for authentication.
+
+### Login Flow:
+1. **Register**: `POST /auth/register`
+2. **Login**: `POST /auth/login` - Returns JWT token
+3. **Use Token**: Include in header: `Authorization: Bearer <token>`
+
+### Admin Routes:
+Protected routes require admin role. Default admin credentials are set in `.env` file.
+
+## 🛡️ Security Features
+
+- ✅ Password hashing with bcrypt
+- ✅ JWT authentication
+- ✅ Role-based access control (RBAC)
+- ✅ CORS configuration
+- ✅ Helmet for security headers
+- ✅ Input validation with class-validator
+- ✅ Environment variable protection
+
+## 🚀 Deployment
+
+### Production Checklist:
+- [ ] Update all environment variables
+- [ ] Use strong JWT secret
+- [ ] Change admin password
+- [ ] Set proper CORS origins
+- [ ] Enable HTTPS
+- [ ] Set up MongoDB backup
+- [ ] Configure Redis for production
+- [ ] Set up monitoring and logging
+
+### Build for Production:
+```bash
+npm run build
+npm run start:prod
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 👥 Authors
+
+- Your Name - [GitHub Profile]
+
+## 🙏 Acknowledgments
+
+- Built with [NestJS](https://nestjs.com/)
+- Database: [MongoDB](https://www.mongodb.com/)
+- Payment: [VNPay](https://vnpay.vn/)
+
+---
+
+**Happy Coding! 🚀**
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).

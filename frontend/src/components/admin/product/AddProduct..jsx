@@ -55,14 +55,8 @@ const AddProduct = ({ onAdd, open, onClose }) => {
     e.preventDefault();
     try {
       const response = await addProduct(newProduct);
-      // Tìm object category từ categories
-      const categoryObj = categories.find(cat => cat._id === newProduct.category_id);
-      // Gán lại cho sản phẩm mới
-      const productWithCategory = {
-        ...response.data,
-        category_id: categoryObj || response.data.category_id
-      };
-      onAdd(productWithCategory);
+      // Keep the product as returned from backend (with populated category_id)
+      onAdd(response.data);
       onClose()
       setNewProduct({
         name: '',

@@ -5,41 +5,44 @@ import SimpleConfirmDialog from './SimpleConfirmDialog';
 import { deleteUser } from '../../../api/user';
 import UserOrderStatusModal from './UserOrderStatusModal';
 import CircularProgress from '@mui/material/CircularProgress';
+import useListPage from '../../../hooks/useListPage';
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const [actionLoading, setActionLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
   const [orderCounts, setOrderCounts] = useState({});
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [orderModalUser, setOrderModalUser] = useState(null);
 
+  // Use custom hook for list management
+  const {
+    data: users,
+    loading,
+    error,
+    removeItem,
+    setData: setUsers,
+  } = useListPage(() => fetchUsers(), {
+    itemsPerPage: 20,
+    autoFetch: true,
+  });
+
   useEffect(() => {
-    const getUsers = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchUsers();
-        setUsers(data);
-        // Lấy order count theo status cho từng user
-        const counts = {};
-        await Promise.all(
-          data.map(async (user) => {
-            const statusCount = await fetchUserOrderStatusCount(user._id);
-            counts[user._id] = statusCount;
-          })
-        );
-        setOrderCounts(counts);
-      } catch (err) {
-        setError('Lỗi khi tải danh sách người dùng');
-      } finally {
-        setLoading(false);
-      }
+    const loadOrderCounts = async () => {
+      if (users.length === 0) return;
+      
+      // Lấy order count theo status cho từng user
+      const counts = {};
+      await Promise.all(
+        users.map(async (user) => {
+          const statusCount = await fetchUserOrderStatusCount(user._id);
+          counts[user._id] = statusCount;
+        })
+      );
+      setOrderCounts(counts);
     };
-    getUsers();
-  }, []);
+    loadOrderCounts();
+  }, [users]);
 
   const handleOpenConfirm = (userId) => {
     setSelectedUserId(userId);
@@ -54,8 +57,9 @@ const UserManagement = () => {
   const handleDeleteUser = async () => {
     if (!selectedUserId) return;
     try {
+      setActionLoading(true);
       await deleteUser(selectedUserId);
-      setUsers(users.filter(u => u._id !== selectedUserId));
+      removeItem(selectedUserId);
       handleCloseConfirm();
     } catch (err) {
       alert('Xóa người dùng thất bại!');

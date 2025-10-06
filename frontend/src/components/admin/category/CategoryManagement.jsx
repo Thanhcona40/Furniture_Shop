@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { deleteCategory, getCategories } from '../../../api/category';
@@ -6,13 +6,24 @@ import CategoryTable from './CategoryTable';
 import EditCategory from './EditCategory';
 import AddCategory from './AddCategory';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import useListPage from '../../../hooks/useListPage';
 
 const CategoryManagement = () => {
-  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
-  const [loading, setLoading] = useState(true);
+
+  // Use custom hook for list management
+  const {
+    data: categories,
+    loading,
+    addItem,
+    updateItem,
+    removeItem,
+  } = useListPage(() => getCategories(), {
+    itemsPerPage: 20,
+    autoFetch: true,
+  });
 
   const handleOpenAddModal = () => setOpenAddModal(true);
   const handleCloseAddModal = () => setOpenAddModal(false);
@@ -22,22 +33,8 @@ const CategoryManagement = () => {
     setSelectedCategory(null);
   };
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await getCategories();
-        setCategories(response.data);
-      } catch (err) {
-        toast.error(err?.response?.data?.message || 'Lỗi tải danh mục');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCategories();
-  }, []);
-
   const handleAdd = (newCategory) => {
-    setCategories((prev) => [...prev, newCategory]);
+    addItem(newCategory);
     toast.success('Thêm danh mục thành công!');
   };
 
@@ -47,14 +44,14 @@ const CategoryManagement = () => {
   };
 
   const handleSaveCategory = (updatedCategory) => {
-    setCategories(categories.map(c => c._id === updatedCategory._id ? updatedCategory : c));
+    updateItem(updatedCategory._id, updatedCategory);
     toast.success('Cập nhật danh mục thành công!');
   };
 
   const handleDeleteCategory = async (categoryId) => {
     try {
       await deleteCategory(categoryId);
-      setCategories(categories.filter(c => c._id !== categoryId));
+      removeItem(categoryId);
       toast.success('Xóa danh mục thành công!');
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Có lỗi xảy ra');

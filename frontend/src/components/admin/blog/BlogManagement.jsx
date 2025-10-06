@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { blogAPI } from '../../../api/blog';
@@ -6,12 +6,25 @@ import BlogTable from './BlogTable';
 import EditBlog from './EditBlog';
 import AddBlog from './AddBlog';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import useListPage from '../../../hooks/useListPage';
 
 const BlogManagement = () => {
-  const [blogs, setBlogs] = useState([]);
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
+
+  // Use custom hook for list management
+  const {
+    data: blogs,
+    loading,
+    addItem,
+    updateItem,
+    removeItem,
+    setData: setBlogs,
+  } = useListPage(() => blogAPI.getAllBlogs(), {
+    itemsPerPage: 20,
+    autoFetch: true,
+  });
 
   const handleOpenAddModal = () => setOpenAddModal(true);
   const handleCloseAddModal = () => setOpenAddModal(false);
@@ -22,7 +35,7 @@ const BlogManagement = () => {
   };
 
   const handleAdd = (newBlog) => {
-    setBlogs((prev) => [newBlog, ...prev]);
+    addItem(newBlog);
     toast.success('Thêm bài viết thành công!');
   };
 
@@ -36,7 +49,7 @@ const BlogManagement = () => {
   };
 
   const handleSaveBlog = (updatedBlog) => {
-    setBlogs(blogs.map(b => b._id === updatedBlog._id ? updatedBlog : b));
+    updateItem(updatedBlog._id, updatedBlog);
     toast.success('Cập nhật bài viết thành công!');
     handleCloseEditModal();
   };
@@ -44,7 +57,7 @@ const BlogManagement = () => {
   const handleDeleteBlog = async (blogId) => {
     try {
       await blogAPI.deleteBlog(blogId);
-      setBlogs(blogs.filter(b => b._id !== blogId));
+      removeItem(blogId);
       toast.success('Xóa bài viết thành công!');
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Có lỗi xảy ra');
